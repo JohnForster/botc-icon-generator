@@ -320,6 +320,36 @@ export const ensureGrayscale = (imageData: ImageData): ImageData => {
   return newImageData;
 };
 
+// Invert image colors (excluding transparent areas)
+export const invertImage = (imageData: ImageData): ImageData => {
+  const { width, height, data } = imageData;
+  const newImageData = new ImageData(width, height);
+  const newData = newImageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+
+    // Only invert non-transparent pixels
+    if (a > 0) {
+      newData[i] = 255 - r; // R
+      newData[i + 1] = 255 - g; // G
+      newData[i + 2] = 255 - b; // B
+      newData[i + 3] = a; // A (preserve alpha)
+    } else {
+      // Keep transparent pixels as-is
+      newData[i] = r;
+      newData[i + 1] = g;
+      newData[i + 2] = b;
+      newData[i + 3] = a;
+    }
+  }
+
+  return newImageData;
+};
+
 // Apply textures to black and white areas
 export const applyTextures = (
   imageData: ImageData,
@@ -384,7 +414,8 @@ export const applyTextures = (
 export const processImage = async (
   file: File,
   colorOption: ColorOption,
-  borderSize: number = 0
+  borderSize: number = 0,
+  invert: boolean = false
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -405,6 +436,11 @@ export const processImage = async (
 
   // Convert to grayscale
   imageData = ensureGrayscale(imageData);
+
+  // Invert image if requested (apply before border to invert the content)
+  if (invert) {
+    imageData = invertImage(imageData);
+  }
 
   // Add border around content if requested
   if (borderSize > 0) {

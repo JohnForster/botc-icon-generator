@@ -13,6 +13,7 @@ export function App() {
   const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
   const [borderSize, setBorderSize] = useState<number>(2);
   const [borderEnabled, setBorderEnabled] = useState<boolean>(false);
+  const [invertEnabled, setInvertEnabled] = useState<boolean>(false);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -91,7 +92,8 @@ export function App() {
       const result = await processImageUtil(
         selectedFile,
         selectedColor,
-        borderEnabled ? borderSize : 0
+        borderEnabled ? borderSize : 0,
+        invertEnabled
       );
       setProcessedImage(result);
       logUsage(selectedFile, {
@@ -237,6 +239,19 @@ export function App() {
                 )
               }
             />
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={invertEnabled}
+                onChange={(e) =>
+                  setInvertEnabled((e.target as HTMLInputElement).checked)
+                }
+              />
+              Invert colors
+            </label>
           </div>
 
           <button
