@@ -6,6 +6,7 @@ import {
   COLOR_LABELS,
   COLOR_VALUES,
 } from "./utils/imageUtils";
+import { logUsage } from "./utils/logger";
 
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,6 +62,7 @@ export function App() {
     try {
       const result = await processImageUtil(selectedFile, selectedColor);
       setProcessedImage(result);
+      logUsage(selectedFile);
 
       // Scroll to result section after processing is complete
       setTimeout(() => {
