@@ -15,8 +15,8 @@
   --border-info: #007bff;
   --border-input: #ddd;
   --border-input-focus: #007bff;
-  --shadow: rgba(0,0,0,0.2);
-  --shadow-light: rgba(0,0,0,0.1);
+  --shadow: rgba(0, 0, 0, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,10 +37,10 @@
     --border-info: #007bff;
     --border-input: #555;
     --border-input-focus: #007bff;
-    --shadow: rgba(0,0,0,0.4);
-    --shadow-light: rgba(0,0,0,0.2);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-light: rgba(0, 0, 0, 0.2);
   }
-  
+
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
@@ -168,13 +168,13 @@ header p {
   cursor: pointer;
   color: white;
   font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
 
 .color-option:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .color-option.selected {
@@ -184,7 +184,9 @@ header p {
 }
 
 .traveller-option {
-  background: linear-gradient(90deg, #047ab7 0%, #047ab7 50%, #8b1011 50%, #8b1011 100%);
+  background: linear-gradient(90deg, #047ab7 50%, #8b1011 50%);
+  background-size: 110%;
+  background-position: center;
   position: relative;
 }
 
