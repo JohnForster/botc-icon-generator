@@ -127,6 +127,38 @@ export const loadTexture = (texturePath: string): Promise<ImageData> => {
   });
 };
 
+// Scale texture to match target dimensions while maintaining square aspect ratio
+export const scaleTexture = (texture: ImageData, targetWidth: number, targetHeight: number): ImageData => {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Could not get canvas context");
+  }
+
+  // Create canvas with texture
+  const textureCanvas = document.createElement("canvas");
+  const textureCtx = textureCanvas.getContext("2d");
+  
+  if (!textureCtx) {
+    throw new Error("Could not get texture canvas context");
+  }
+
+  textureCanvas.width = texture.width;
+  textureCanvas.height = texture.height;
+  textureCtx.putImageData(texture, 0, 0);
+
+  // Use the larger dimension to maintain square aspect ratio
+  const targetSize = Math.max(targetWidth, targetHeight);
+  
+  // Scale texture to square size
+  canvas.width = targetSize;
+  canvas.height = targetSize;
+  ctx.drawImage(textureCanvas, 0, 0, targetSize, targetSize);
+
+  return ctx.getImageData(0, 0, targetSize, targetSize);
+};
+
 
 // Convert image to grayscale if it's not already black and white
 export const ensureGrayscale = (imageData: ImageData): ImageData => {
@@ -163,6 +195,10 @@ export const applyTextures = (
   const newImageData = new ImageData(width, height);
   const newData = newImageData.data;
 
+  // Scale textures to match input image dimensions (as squares)
+  const scaledWhiteTexture = scaleTexture(whiteTexture, width, height);
+  const scaledColorTexture = scaleTexture(colorTexture, width, height);
+
   // If we have an original image (for grayscale handling), use it as base
   if (originalImage) {
     for (let i = 0; i < originalImage.data.length; i++) {
@@ -187,15 +223,15 @@ export const applyTextures = (
       let textureToUse: ImageData;
       if (intensity < 128) {
         // Closer to black - use color texture
-        textureToUse = colorTexture;
+        textureToUse = scaledColorTexture;
       } else {
         // Closer to white - use white texture
-        textureToUse = whiteTexture;
+        textureToUse = scaledWhiteTexture;
       }
 
-      // Get texture pixel (tile if necessary)
-      const textureX = x % textureToUse.width;
-      const textureY = y % textureToUse.height;
+      // Get texture pixel (no tiling needed since texture is scaled to image size)
+      const textureX = Math.min(x, textureToUse.width - 1);
+      const textureY = Math.min(y, textureToUse.height - 1);
       const textureIndex = (textureY * textureToUse.width + textureX) * 4;
 
       newData[index] = textureToUse.data[textureIndex]; // R
@@ -235,8 +271,8 @@ export const processImage = async (
 
 
   // Load textures
-  const whiteTexture = await loadTexture("/background-white.webp");
-  const colorTexture = await loadTexture(`/background-${colorOption}.webp`);
+  const whiteTexture = await loadTexture(`${import.meta.env.BASE_URL}background-white.webp`);
+  const colorTexture = await loadTexture(`${import.meta.env.BASE_URL}background-${colorOption}.webp`);
 
   // Apply textures
   const finalImage = applyTextures(
