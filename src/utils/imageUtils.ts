@@ -162,6 +162,140 @@ export const scaleTexture = (texture: ImageData, targetWidth: number, targetHeig
 };
 
 
+// Resize image to 320x320px preserving aspect ratio with transparent padding
+export const resizeToSquare = (imageData: ImageData, targetSize: number = 320): ImageData => {
+  const { width, height } = imageData;
+  
+  // If already the target size, return as-is
+  if (width === targetSize && height === targetSize) {
+    return imageData;
+  }
+  
+  // Calculate scaling to fit within target size while preserving aspect ratio
+  const scale = Math.min(targetSize / width, targetSize / height);
+  const scaledWidth = Math.round(width * scale);
+  const scaledHeight = Math.round(height * scale);
+  
+  // Create canvas for scaling
+  const scaleCanvas = document.createElement("canvas");
+  const scaleCtx = scaleCanvas.getContext("2d");
+  
+  if (!scaleCtx) {
+    throw new Error("Could not get canvas context for scaling");
+  }
+  
+  // Set up original image canvas
+  const originalCanvas = document.createElement("canvas");
+  const originalCtx = originalCanvas.getContext("2d");
+  
+  if (!originalCtx) {
+    throw new Error("Could not get canvas context for original image");
+  }
+  
+  originalCanvas.width = width;
+  originalCanvas.height = height;
+  originalCtx.putImageData(imageData, 0, 0);
+  
+  // Scale the image
+  scaleCanvas.width = scaledWidth;
+  scaleCanvas.height = scaledHeight;
+  scaleCtx.drawImage(originalCanvas, 0, 0, scaledWidth, scaledHeight);
+  
+  // Create final canvas with target size
+  const finalCanvas = document.createElement("canvas");
+  const finalCtx = finalCanvas.getContext("2d");
+  
+  if (!finalCtx) {
+    throw new Error("Could not get canvas context for final image");
+  }
+  
+  finalCanvas.width = targetSize;
+  finalCanvas.height = targetSize;
+  
+  // Center the scaled image on the target canvas (transparent background by default)
+  const offsetX = Math.round((targetSize - scaledWidth) / 2);
+  const offsetY = Math.round((targetSize - scaledHeight) / 2);
+  
+  finalCtx.drawImage(scaleCanvas, offsetX, offsetY);
+  
+  return finalCtx.getImageData(0, 0, targetSize, targetSize);
+};
+
+// Add white border around image content (not transparent areas)
+export const addContentBorder = (imageData: ImageData, borderSize: number): ImageData => {
+  if (borderSize <= 0) return imageData;
+
+  const { width, height, data } = imageData;
+  const newImageData = new ImageData(width, height);
+  const newData = newImageData.data;
+
+  // Copy original image data
+  for (let i = 0; i < data.length; i++) {
+    newData[i] = data[i];
+  }
+
+  // Create a mask of the original content (non-transparent pixels)
+  const contentMask = new Array(width * height).fill(false);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = y * width + x;
+      const alphaIndex = index * 4 + 3;
+      if (data[alphaIndex] > 0) {
+        contentMask[index] = true;
+      }
+    }
+  }
+
+  // Dilate the content mask to create border area
+  for (let iteration = 0; iteration < borderSize; iteration++) {
+    const newMask = [...contentMask];
+    
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const index = y * width + x;
+        
+        // Skip if already part of content
+        if (contentMask[index]) continue;
+        
+        // Check if any neighbor is content
+        let hasContentNeighbor = false;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const nx = x + dx;
+            const ny = y + dy;
+            
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const neighborIndex = ny * width + nx;
+              if (contentMask[neighborIndex]) {
+                hasContentNeighbor = true;
+                break;
+              }
+            }
+          }
+          if (hasContentNeighbor) break;
+        }
+        
+        if (hasContentNeighbor) {
+          newMask[index] = true;
+          // Add white border pixel
+          const pixelIndex = index * 4;
+          newData[pixelIndex] = 255;     // R
+          newData[pixelIndex + 1] = 255; // G
+          newData[pixelIndex + 2] = 255; // B
+          newData[pixelIndex + 3] = 255; // A
+        }
+      }
+    }
+    
+    // Update content mask for next iteration
+    for (let i = 0; i < contentMask.length; i++) {
+      contentMask[i] = newMask[i];
+    }
+  }
+
+  return newImageData;
+};
+
 // Convert image to grayscale if it's not already black and white
 export const ensureGrayscale = (imageData: ImageData): ImageData => {
   const { width, height, data } = imageData;
@@ -249,7 +383,8 @@ export const applyTextures = (
 // Main processing function
 export const processImage = async (
   file: File,
-  colorOption: ColorOption
+  colorOption: ColorOption,
+  borderSize: number = 0
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -271,6 +406,10 @@ export const processImage = async (
   // Convert to grayscale
   imageData = ensureGrayscale(imageData);
 
+  // Add border around content if requested
+  if (borderSize > 0) {
+    imageData = addContentBorder(imageData, borderSize);
+  }
 
   // Load textures
   const whiteTexture = await loadTexture(`${import.meta.env.BASE_URL}background-white.webp`);

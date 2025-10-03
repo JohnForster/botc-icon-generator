@@ -11,6 +11,8 @@ import { logUsage } from "./utils/logger";
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
+  const [borderSize, setBorderSize] = useState<number>(3);
+  const [borderEnabled, setBorderEnabled] = useState<boolean>(true);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -60,7 +62,11 @@ export function App() {
 
     setIsProcessing(true);
     try {
-      const result = await processImageUtil(selectedFile, selectedColor);
+      const result = await processImageUtil(
+        selectedFile,
+        selectedColor,
+        borderEnabled ? borderSize : 0
+      );
       setProcessedImage(result);
       logUsage(selectedFile);
 
@@ -95,6 +101,12 @@ export function App() {
         <p>
           Uploaded images should have a transparent background. Black and white
           images work best.
+        </p>
+        <p>
+          You can remove backgrounds from images using free tools such as
+          <a href="https://removebackground.app/">
+            https://removebackground.app/
+          </a>
         </p>
       </header>
 
@@ -167,6 +179,36 @@ export function App() {
                 )
               )}
             </div>
+          </div>
+
+          <div class="control-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={borderEnabled}
+                onChange={(e) =>
+                  setBorderEnabled((e.target as HTMLInputElement).checked)
+                }
+              />
+              Add border
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label for="border-size">Border Size (pixels):</label>
+            <input
+              id="border-size"
+              type="number"
+              min="0"
+              max="20"
+              value={borderSize}
+              disabled={!borderEnabled}
+              onChange={(e) =>
+                setBorderSize(
+                  parseInt((e.target as HTMLInputElement).value) || 0
+                )
+              }
+            />
           </div>
 
           <button
