@@ -1,4 +1,9 @@
 export const logUsage = async (file: File) => {
+  // Only log usage in production environment
+  if (!import.meta.env.PROD) {
+    return;
+  }
+
   let FIREBASE_URL = "https://logusage-dvbaqkhwga-uc.a.run.app ";
   fetch(FIREBASE_URL, {
     method: "POST",
