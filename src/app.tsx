@@ -1,4 +1,4 @@
-import { useState, useRef } from "preact/hooks";
+import { useState, useRef, useEffect } from "preact/hooks";
 import "./app.css";
 import {
   processImage as processImageUtil,
@@ -57,6 +57,32 @@ export function App() {
     }
   };
 
+  const handlePaste = async (e: ClipboardEvent) => {
+    e.preventDefault();
+
+    if (!e.clipboardData) return;
+
+    const items = Array.from(e.clipboardData.items);
+    const imageItem = items.find((item) => item.type.startsWith("image/"));
+
+    if (imageItem) {
+      const file = imageItem.getAsFile();
+      if (file) {
+        handleFileSelect(file);
+      }
+    }
+  };
+
+  // Add paste event listener
+  useEffect(() => {
+    const handlePasteEvent = (e: ClipboardEvent) => handlePaste(e);
+    document.addEventListener("paste", handlePasteEvent);
+
+    return () => {
+      document.removeEventListener("paste", handlePasteEvent);
+    };
+  }, []);
+
   const processImage = async () => {
     if (!selectedFile) return;
 
@@ -97,6 +123,15 @@ export function App() {
     link.click();
   };
 
+  const clearImage = () => {
+    setSelectedFile(null);
+    setPreviewImage(null);
+    setProcessedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div class="app">
       <header>
@@ -107,46 +142,33 @@ export function App() {
         </p>
         <p>
           You can remove backgrounds from images using free tools such as{" "}
-          <a href="https://removebackground.app/">
-            https://removebackground.app/
-          </a>
+          <a href="https://www.remove.bg/">https://www.remove.bg/</a>
         </p>
       </header>
 
       <main>
-        <div class="upload-section">
-          <div
-            class={`upload-area ${isDragOver ? "drag-over" : ""} ${
-              selectedFile ? "has-file" : ""
-            }`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,.svg"
-              onChange={handleFileInputChange}
-              style={{ display: "none" }}
-            />
-            {selectedFile ? (
-              <div class="file-info">
-                <p>
-                  <strong>Selected:</strong> {selectedFile.name}
-                </p>
-                <p class="file-size">
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </p>
-              </div>
-            ) : (
+        {!selectedFile && (
+          <div class="upload-section">
+            <div
+              class={`upload-area ${isDragOver ? "drag-over" : ""}`}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.svg"
+                onChange={handleFileInputChange}
+                style={{ display: "none" }}
+              />
               <div class="upload-prompt">
-                <p>Drop your image here or click to browse</p>
+                <p>Drop your image here, click to browse, or paste (Ctrl+V)</p>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {selectedFile && previewImage && (
           <div class="preview-section">
@@ -154,6 +176,9 @@ export function App() {
             <div class="image-preview">
               <img src={previewImage} alt="Original uploaded image" />
             </div>
+            <button class="clear-btn" onClick={clearImage}>
+              Clear Image
+            </button>
           </div>
         )}
 
