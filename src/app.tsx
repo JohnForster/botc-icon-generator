@@ -11,8 +11,8 @@ import { logUsage } from "./utils/logger";
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
-  const [borderSize, setBorderSize] = useState<number>(3);
-  const [borderEnabled, setBorderEnabled] = useState<boolean>(true);
+  const [borderSize, setBorderSize] = useState<number>(2);
+  const [borderEnabled, setBorderEnabled] = useState<boolean>(false);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
