@@ -128,7 +128,6 @@ export function App() {
             ) : (
               <div class="upload-prompt">
                 <p>Drop your image here or click to browse</p>
-                <p class="file-types">Only supports PNG for now.</p>
               </div>
             )}
           </div>
