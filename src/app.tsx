@@ -14,6 +14,8 @@ export function App() {
   const [borderSize, setBorderSize] = useState<number>(2);
   const [borderEnabled, setBorderEnabled] = useState<boolean>(false);
   const [invertEnabled, setInvertEnabled] = useState<boolean>(false);
+  const [cropEnabled, setCropEnabled] = useState<boolean>(true);
+  const [horizontalPadding, setHorizontalPadding] = useState<number>(0);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -93,7 +95,9 @@ export function App() {
         selectedFile,
         selectedColor,
         borderEnabled ? borderSize : 0,
-        invertEnabled
+        invertEnabled,
+        selectedColor === "traveller" ? horizontalPadding : 0,
+        cropEnabled
       );
       setProcessedImage(result);
       logUsage(selectedFile, {
@@ -209,6 +213,31 @@ export function App() {
                 )
               )}
             </div>
+            <div class="control-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={invertEnabled}
+                  onChange={(e) =>
+                    setInvertEnabled((e.target as HTMLInputElement).checked)
+                  }
+                />
+                Invert colors
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={cropEnabled}
+                  onChange={(e) =>
+                    setCropEnabled((e.target as HTMLInputElement).checked)
+                  }
+                />
+                Crop to content
+              </label>
+            </div>
           </div>
 
           <div class="control-group">
@@ -222,9 +251,7 @@ export function App() {
               />
               Add border
             </label>
-          </div>
 
-          <div class="control-group">
             <label for="border-size">Border Size (pixels):</label>
             <input
               id="border-size"
@@ -241,18 +268,27 @@ export function App() {
             />
           </div>
 
-          <div class="control-group">
-            <label>
+          {selectedColor === "traveller" && (
+            <div class="control-group">
+              <label for="horizontal-padding">Horizontal Adjustment:</label>
               <input
-                type="checkbox"
-                checked={invertEnabled}
+                id="horizontal-padding"
+                type="number"
+                min="-160"
+                max="160"
+                value={horizontalPadding}
                 onChange={(e) =>
-                  setInvertEnabled((e.target as HTMLInputElement).checked)
+                  setHorizontalPadding(
+                    parseInt((e.target as HTMLInputElement).value) || 0
+                  )
                 }
               />
-              Invert colors
-            </label>
-          </div>
+              <br />
+              <small>
+                Positive = right adjustment, Negative = left adjustment
+              </small>
+            </div>
+          )}
 
           <button
             class="process-btn"
