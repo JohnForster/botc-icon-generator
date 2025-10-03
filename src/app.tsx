@@ -106,7 +106,7 @@ export function App() {
           images work best.
         </p>
         <p>
-          You can remove backgrounds from images using free tools such as
+          You can remove backgrounds from images using free tools such as{" "}
           <a href="https://removebackground.app/">
             https://removebackground.app/
           </a>
