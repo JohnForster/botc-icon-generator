@@ -1,4 +1,6 @@
-export const logUsage = async (file: File) => {
+type ExtraInfo = { borderSize: number; selectedColour: string };
+
+export const logUsage = async (file: File, extraInfo: ExtraInfo) => {
   // Only log usage in production environment
   if (!import.meta.env.PROD) {
     return;
@@ -11,6 +13,7 @@ export const logUsage = async (file: File) => {
       filename: file.name,
       filesize: file.size,
       filetype: file.type,
+      ...extraInfo,
     }),
     headers: {
       "x-password": "dungeon-mister",

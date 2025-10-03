@@ -68,7 +68,10 @@ export function App() {
         borderEnabled ? borderSize : 0
       );
       setProcessedImage(result);
-      logUsage(selectedFile);
+      logUsage(selectedFile, {
+        borderSize: borderEnabled ? borderSize : 0,
+        selectedColour: selectedColor,
+      });
 
       // Scroll to result section after processing is complete
       setTimeout(() => {
