@@ -147,20 +147,26 @@ export function App() {
           <div class="control-group">
             <label>Character Type:</label>
             <div class="color-options">
-              {(["blue", "red", "gold"] as ColorOption[]).map((color) => (
-                <button
-                  key={color}
-                  class={`color-option ${
-                    selectedColor === color ? "selected" : ""
-                  }`}
-                  onClick={() => setSelectedColor(color)}
-                  style={{
-                    backgroundColor: COLOR_VALUES[color],
-                  }}
-                >
-                  {COLOR_LABELS[color]}
-                </button>
-              ))}
+              {(["blue", "red", "gold", "traveller"] as ColorOption[]).map(
+                (color) => (
+                  <button
+                    key={color}
+                    class={`color-option ${
+                      color === "traveller" ? "traveller-option" : ""
+                    } ${selectedColor === color ? "selected" : ""}`}
+                    onClick={() => setSelectedColor(color)}
+                    style={
+                      color !== "traveller"
+                        ? {
+                            backgroundColor: COLOR_VALUES[color],
+                          }
+                        : undefined
+                    }
+                  >
+                    {COLOR_LABELS[color]}
+                  </button>
+                )
+              )}
             </div>
           </div>
 

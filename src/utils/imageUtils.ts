@@ -1,15 +1,17 @@
-export type ColorOption = "red" | "gold" | "blue";
+export type ColorOption = "red" | "gold" | "blue" | "traveller";
 
 export const COLOR_LABELS: Record<ColorOption, string> = {
   red: "Evil",
   blue: "Good",
   gold: "Fabled",
+  traveller: "Traveller",
 };
 
 export const COLOR_VALUES: Record<ColorOption, string> = {
   red: "#8b1011",
   blue: "#047ab7",
   gold: "#dba318",
+  traveller: "#9b4f9b",
 };
 
 // Convert SVG to PNG using canvas
@@ -272,7 +274,8 @@ export const processImage = async (
 
   // Load textures
   const whiteTexture = await loadTexture(`${import.meta.env.BASE_URL}background-white.webp`);
-  const colorTexture = await loadTexture(`${import.meta.env.BASE_URL}background-${colorOption}.webp`);
+  const colorTextureExt = colorOption === "traveller" ? "png" : "webp";
+  const colorTexture = await loadTexture(`${import.meta.env.BASE_URL}background-${colorOption}.${colorTextureExt}`);
 
   // Apply textures
   const finalImage = applyTextures(

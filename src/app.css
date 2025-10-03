@@ -131,6 +131,11 @@ header p {
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+.traveller-option {
+  background: linear-gradient(90deg, #047ab7 50%, #8b1011 50%);
+  position: relative;
+}
+
 #border-size {
   padding: 0.5rem;
   border: 2px solid #ddd;
