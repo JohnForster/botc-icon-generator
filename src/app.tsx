@@ -1,0 +1,209 @@
+import { useState, useRef } from "preact/hooks";
+import "./app.css";
+import {
+  processImage as processImageUtil,
+  type ColorOption,
+  COLOR_LABELS,
+  COLOR_VALUES,
+} from "./utils/imageUtils";
+
+export function App() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
+  const [borderSize, setBorderSize] = useState(5);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultSectionRef = useRef<HTMLDivElement>(null);
+
+  const handleFileSelect = (file: File) => {
+    if (file.type.startsWith("image/") || file.type === "image/svg+xml") {
+      setSelectedFile(file);
+      setProcessedImage(null);
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewImage(previewUrl);
+    }
+  };
+
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  };
+
+  const handleDragOver = (e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleFileInputChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      handleFileSelect(target.files[0]);
+    }
+  };
+
+  const processImage = async () => {
+    if (!selectedFile) return;
+
+    setIsProcessing(true);
+    try {
+      const result = await processImageUtil(
+        selectedFile,
+        selectedColor,
+        borderSize
+      );
+      setProcessedImage(result);
+
+      // Scroll to result section after processing is complete
+      setTimeout(() => {
+        resultSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    } catch (error) {
+      console.error("Error processing image:", error);
+      alert("Failed to process image. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const downloadImage = () => {
+    if (!processedImage) return;
+
+    const link = document.createElement("a");
+    link.href = processedImage;
+    link.download = "processed-icon.png";
+    link.click();
+  };
+
+  return (
+    <div class="app">
+      <header>
+        <h1>Blood on the Clocktower Character Icon Generator</h1>
+        <p>
+          Uploaded images should be black and white, with a transparent
+          background.
+        </p>
+      </header>
+
+      <main>
+        <div class="upload-section">
+          <div
+            class={`upload-area ${isDragOver ? "drag-over" : ""} ${
+              selectedFile ? "has-file" : ""
+            }`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.svg"
+              onChange={handleFileInputChange}
+              style={{ display: "none" }}
+            />
+            {selectedFile ? (
+              <div class="file-info">
+                <p>
+                  <strong>Selected:</strong> {selectedFile.name}
+                </p>
+                <p class="file-size">
+                  {(selectedFile.size / 1024).toFixed(1)} KB
+                </p>
+              </div>
+            ) : (
+              <div class="upload-prompt">
+                <p>Drop your image here or click to browse</p>
+                <p class="file-types">Only supports PNG for now.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {selectedFile && previewImage && (
+          <div class="preview-section">
+            <h3>Original Image</h3>
+            <div class="image-preview">
+              <img src={previewImage} alt="Original uploaded image" />
+            </div>
+          </div>
+        )}
+
+        <div class="controls-section">
+          <div class="control-group">
+            <label>Character Type:</label>
+            <div class="color-options">
+              {(["blue", "red", "gold"] as ColorOption[]).map((color) => (
+                <button
+                  key={color}
+                  class={`color-option ${
+                    selectedColor === color ? "selected" : ""
+                  }`}
+                  onClick={() => setSelectedColor(color)}
+                  style={{
+                    backgroundColor: COLOR_VALUES[color],
+                  }}
+                >
+                  {COLOR_LABELS[color]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label htmlFor="border-size">Border Size (px):</label>
+            <input
+              id="border-size"
+              type="number"
+              min="0"
+              max="50"
+              value={borderSize}
+              onChange={(e) =>
+                setBorderSize(
+                  parseInt((e.target as HTMLInputElement).value) || 5
+                )
+              }
+            />
+          </div>
+
+          <button
+            class="process-btn"
+            onClick={processImage}
+            disabled={!selectedFile || isProcessing}
+          >
+            {isProcessing ? "Processing..." : "Generate Icon"}
+          </button>
+        </div>
+
+        {processedImage && (
+          <div class="result-section" ref={resultSectionRef}>
+            <h3>Generated Icon</h3>
+            <div class="image-preview">
+              <img src={processedImage} alt="Processed icon" />
+            </div>
+            <button class="download-btn" onClick={downloadImage}>
+              Download PNG
+            </button>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
