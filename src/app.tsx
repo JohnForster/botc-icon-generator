@@ -59,10 +59,7 @@ export function App() {
 
     setIsProcessing(true);
     try {
-      const result = await processImageUtil(
-        selectedFile,
-        selectedColor
-      );
+      const result = await processImageUtil(selectedFile, selectedColor);
       setProcessedImage(result);
 
       // Scroll to result section after processing is complete
@@ -94,8 +91,8 @@ export function App() {
       <header>
         <h1>Blood on the Clocktower Character Icon Generator</h1>
         <p>
-          Uploaded images should be black and white, with a transparent
-          background.
+          Uploaded images should have a transparent background. Black and white
+          images work best.
         </p>
       </header>
 
@@ -164,7 +161,6 @@ export function App() {
               ))}
             </div>
           </div>
-
 
           <button
             class="process-btn"
