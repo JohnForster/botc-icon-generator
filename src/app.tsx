@@ -10,7 +10,6 @@ import {
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
-  const [borderSize, setBorderSize] = useState(5);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -62,8 +61,7 @@ export function App() {
     try {
       const result = await processImageUtil(
         selectedFile,
-        selectedColor,
-        borderSize
+        selectedColor
       );
       setProcessedImage(result);
 
@@ -167,21 +165,6 @@ export function App() {
             </div>
           </div>
 
-          <div class="control-group">
-            <label htmlFor="border-size">Border Size (px):</label>
-            <input
-              id="border-size"
-              type="number"
-              min="0"
-              max="50"
-              value={borderSize}
-              onChange={(e) =>
-                setBorderSize(
-                  parseInt((e.target as HTMLInputElement).value) || 5
-                )
-              }
-            />
-          </div>
 
           <button
             class="process-btn"

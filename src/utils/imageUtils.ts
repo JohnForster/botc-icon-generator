@@ -127,41 +127,6 @@ export const loadTexture = (texturePath: string): Promise<ImageData> => {
   });
 };
 
-// Add border to image
-export const addBorder = (
-  imageData: ImageData,
-  borderSize: number
-): ImageData => {
-  const { width, height, data } = imageData;
-  const newWidth = width + borderSize * 2;
-  const newHeight = height + borderSize * 2;
-
-  const newImageData = new ImageData(newWidth, newHeight);
-  const newData = newImageData.data;
-
-  // Fill with white background
-  for (let i = 0; i < newData.length; i += 4) {
-    newData[i] = 255; // R
-    newData[i + 1] = 255; // G
-    newData[i + 2] = 255; // B
-    newData[i + 3] = 255; // A
-  }
-
-  // Copy original image data to center
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const srcIndex = (y * width + x) * 4;
-      const dstIndex = ((y + borderSize) * newWidth + (x + borderSize)) * 4;
-
-      newData[dstIndex] = data[srcIndex]; // R
-      newData[dstIndex + 1] = data[srcIndex + 1]; // G
-      newData[dstIndex + 2] = data[srcIndex + 2]; // B
-      newData[dstIndex + 3] = data[srcIndex + 3]; // A
-    }
-  }
-
-  return newImageData;
-};
 
 // Convert image to grayscale if it's not already black and white
 export const ensureGrayscale = (imageData: ImageData): ImageData => {
@@ -246,8 +211,7 @@ export const applyTextures = (
 // Main processing function
 export const processImage = async (
   file: File,
-  colorOption: ColorOption,
-  borderSize: number
+  colorOption: ColorOption
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -269,9 +233,6 @@ export const processImage = async (
   // Convert to grayscale
   imageData = ensureGrayscale(imageData);
 
-  // Add border
-  imageData = addBorder(imageData, borderSize);
-  const borderOriginal = addBorder(originalImageData, borderSize);
 
   // Load textures
   const whiteTexture = await loadTexture("/background-white.webp");
@@ -282,7 +243,7 @@ export const processImage = async (
     imageData,
     whiteTexture,
     colorTexture,
-    borderOriginal
+    originalImageData
   );
 
   // Convert to data URL
