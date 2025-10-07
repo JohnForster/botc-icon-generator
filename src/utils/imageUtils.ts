@@ -248,12 +248,13 @@ export const addContentBorder = (
   }
 
   // Create a mask of the original content (non-transparent pixels)
+  const ALPHA_THRESHOLD = 0.8 * 255;
   const contentMask = new Array(width * height).fill(false);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const index = y * width + x;
       const alphaIndex = index * 4 + 3;
-      if (data[alphaIndex] > 0) {
+      if (data[alphaIndex] > ALPHA_THRESHOLD) {
         contentMask[index] = true;
       }
     }
@@ -340,8 +341,8 @@ export const increaseContrast = (imageData: ImageData): ImageData => {
   const newData = newImageData.data;
 
   // Define thresholds (45% and 55% of 255)
-  const lowerThreshold = Math.round(255 * 0.45); // 102
-  const upperThreshold = Math.round(255 * 0.55); // 153
+  const lowerThreshold = Math.round(255 * 0.49); // 102
+  const upperThreshold = Math.round(255 * 0.51); // 153
 
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i];
