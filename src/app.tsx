@@ -16,6 +16,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   horizontalPadding: 0,
   smoothBlend: true,
   increaseContrast: true,
+  removeBackground: false,
 };
 
 export function App() {
@@ -56,13 +57,11 @@ export function App() {
         options.selectedColor === "traveller" ? options.horizontalPadding : 0,
         options.cropEnabled,
         options.smoothBlend,
-        options.increaseContrast
+        options.increaseContrast,
+        options.removeBackground
       );
       setProcessedImage(result);
-      logUsage(selectedFile, {
-        borderSize: options.borderEnabled ? options.borderSize : 0,
-        selectedColour: options.selectedColor,
-      });
+      logUsage(selectedFile, options);
     } catch (error) {
       console.error("Error processing image:", error);
       alert("Failed to process image. Please try again.");
@@ -89,8 +88,8 @@ export function App() {
           images work best.
         </p>
         <p>
-          You can remove backgrounds from images using free tools such as{" "}
-          <a href="https://www.remove.bg/">https://www.remove.bg/</a>
+          If background removal doesn't work or isn't very good, use a free tool
+          such as <a href="https://www.remove.bg/">https://www.remove.bg/</a>
         </p>
       </header>
 

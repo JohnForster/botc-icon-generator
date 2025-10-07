@@ -9,4 +9,5 @@ export interface ProcessingOptions {
   horizontalPadding: number;
   smoothBlend: boolean;
   increaseContrast: boolean;
+  removeBackground: boolean;
 }

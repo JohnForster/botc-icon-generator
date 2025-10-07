@@ -54,6 +54,20 @@ export function OptionsSelector({
           <label class="checkbox-option">
             <input
               type="checkbox"
+              checked={options.removeBackground}
+              onChange={(e) =>
+                updateOption(
+                  "removeBackground",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Remove background (slow)</span>
+          </label>
+
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
               checked={options.invertEnabled}
               onChange={(e) =>
                 updateOption(

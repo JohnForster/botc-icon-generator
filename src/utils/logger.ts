@@ -1,6 +1,6 @@
-type ExtraInfo = { borderSize: number; selectedColour: string };
+import type { ProcessingOptions } from "../types";
 
-export const logUsage = async (file: File, extraInfo: ExtraInfo) => {
+export const logUsage = async (file: File, extraInfo: ProcessingOptions) => {
   // Only log usage in production environment
   if (!import.meta.env.PROD) {
     return;

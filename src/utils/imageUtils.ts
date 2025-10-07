@@ -1,5 +1,22 @@
 export type ColorOption = "red" | "gold" | "blue" | "traveller";
 
+import { removeBackground } from '@imgly/background-removal';
+
+// Cache for background removal results
+interface BackgroundRemovalCache {
+  [key: string]: File;
+}
+
+const backgroundRemovalCache: BackgroundRemovalCache = {};
+
+// Generate a hash from file content for cache key
+const generateFileHash = async (file: File): Promise<string> => {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 export const COLOR_LABELS: Record<ColorOption, string> = {
   red: "Evil",
   blue: "Good",
@@ -58,6 +75,32 @@ export const svgToPng = (svgFile: File): Promise<Blob> => {
     reader.onerror = () => reject(new Error("Failed to read SVG file"));
     reader.readAsText(svgFile);
   });
+};
+
+// Remove background from image file with caching
+export const removeImageBackground = async (file: File): Promise<File> => {
+  try {
+    // Generate cache key from file content
+    const cacheKey = await generateFileHash(file);
+    
+    // Check if result is already cached
+    if (backgroundRemovalCache[cacheKey]) {
+      console.log("Using cached background removal result");
+      return backgroundRemovalCache[cacheKey];
+    }
+    
+    console.log("Processing background removal (not cached)");
+    const blob = await removeBackground(file);
+    const resultFile = new File([blob], file.name, { type: "image/png" });
+    
+    // Cache the result
+    backgroundRemovalCache[cacheKey] = resultFile;
+    
+    return resultFile;
+  } catch (error) {
+    console.error("Background removal failed:", error);
+    throw new Error("Failed to remove background");
+  }
 };
 
 // Convert image file to ImageData
@@ -615,13 +658,19 @@ export const processImage = async (
   horizontalPadding: number = 0,
   shouldCrop: boolean = true,
   smoothBlend: boolean = true,
-  enhanceContrast: boolean = false
+  enhanceContrast: boolean = false,
+  shouldRemoveBackground: boolean = false
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
   if (file.type === "image/svg+xml") {
     const pngBlob = await svgToPng(file);
     processFile = new File([pngBlob], "converted.png", { type: "image/png" });
+  }
+
+  // Remove background if requested (apply before other processing)
+  if (shouldRemoveBackground) {
+    processFile = await removeImageBackground(processFile);
   }
 
   // Convert file to ImageData
