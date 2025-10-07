@@ -8,7 +8,10 @@ interface OptionsSelectorProps {
   onOptionsChange: (options: ProcessingOptions) => void;
 }
 
-export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorProps) {
+export function OptionsSelector({
+  options,
+  onOptionsChange,
+}: OptionsSelectorProps) {
   const updateOption = <K extends keyof ProcessingOptions>(
     key: K,
     value: ProcessingOptions[K]
@@ -18,26 +21,29 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
 
   return (
     <div class="options-selector">
+      <h3 class="section-title">Options</h3>
       {/* Character Type Section */}
       <section class="options-section">
         <h3>Character Type</h3>
         <div class="character-type-grid">
-          {(["blue", "red", "gold", "traveller"] as ColorOption[]).map((color) => (
-            <button
-              key={color}
-              class={`character-type-btn ${options.selectedColor === color ? "selected" : ""} ${
-                color === "traveller" ? "traveller" : ""
-              }`}
-              onClick={() => updateOption("selectedColor", color)}
-              style={
-                color !== "traveller"
-                  ? { backgroundColor: COLOR_VALUES[color] }
-                  : undefined
-              }
-            >
-              {COLOR_LABELS[color]}
-            </button>
-          ))}
+          {(["blue", "red", "gold", "traveller"] as ColorOption[]).map(
+            (color) => (
+              <button
+                key={color}
+                class={`character-type-btn ${
+                  options.selectedColor === color ? "selected" : ""
+                } ${color === "traveller" ? "traveller" : ""}`}
+                onClick={() => updateOption("selectedColor", color)}
+                style={
+                  color !== "traveller"
+                    ? { backgroundColor: COLOR_VALUES[color] }
+                    : undefined
+                }
+              >
+                {COLOR_LABELS[color]}
+              </button>
+            )
+          )}
         </div>
       </section>
 
@@ -50,7 +56,10 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
               type="checkbox"
               checked={options.invertEnabled}
               onChange={(e) =>
-                updateOption("invertEnabled", (e.target as HTMLInputElement).checked)
+                updateOption(
+                  "invertEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
               }
             />
             <span class="checkbox-label">Invert colors</span>
@@ -61,10 +70,27 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
               type="checkbox"
               checked={options.cropEnabled}
               onChange={(e) =>
-                updateOption("cropEnabled", (e.target as HTMLInputElement).checked)
+                updateOption(
+                  "cropEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
               }
             />
             <span class="checkbox-label">Crop to content</span>
+          </label>
+
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
+              checked={options.smoothBlend}
+              onChange={(e) =>
+                updateOption(
+                  "smoothBlend",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Smooth blend</span>
           </label>
         </div>
       </section>
@@ -78,12 +104,15 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
               type="checkbox"
               checked={options.borderEnabled}
               onChange={(e) =>
-                updateOption("borderEnabled", (e.target as HTMLInputElement).checked)
+                updateOption(
+                  "borderEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
               }
             />
             <span class="checkbox-label">Add border</span>
           </label>
-          
+
           {options.borderEnabled && (
             <div class="number-input-group">
               <label class="number-label">Border size (pixels)</label>
@@ -93,7 +122,10 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
                 max="20"
                 value={options.borderSize}
                 onChange={(e) =>
-                  updateOption("borderSize", parseInt((e.target as HTMLInputElement).value) || 0)
+                  updateOption(
+                    "borderSize",
+                    parseInt((e.target as HTMLInputElement).value) || 0
+                  )
                 }
                 class="number-input"
               />
@@ -114,7 +146,10 @@ export function OptionsSelector({ options, onOptionsChange }: OptionsSelectorPro
               max="160"
               value={options.horizontalPadding}
               onChange={(e) =>
-                updateOption("horizontalPadding", parseInt((e.target as HTMLInputElement).value) || 0)
+                updateOption(
+                  "horizontalPadding",
+                  parseInt((e.target as HTMLInputElement).value) || 0
+                )
               }
               class="number-input"
             />

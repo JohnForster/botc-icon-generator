@@ -1,7 +1,6 @@
 .options-selector {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 12px;
@@ -13,6 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding-bottom: 1.5rem;
 }
 
 .options-section h3 {
@@ -64,7 +64,8 @@
 .processing-options {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  column-gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* Border Options */
@@ -81,6 +82,7 @@
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem 0;
+  flex-shrink: 0;
 }
 
 .checkbox-option input[type="checkbox"] {
@@ -144,22 +146,22 @@
   .character-type-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-  
+
   .processing-options {
     flex-direction: row;
-    gap: 2rem;
+    column-gap: 2rem;
   }
-  
+
   .border-options {
     align-items: flex-start;
   }
-  
+
   .number-input-group {
     flex-direction: row;
     align-items: center;
     gap: 1rem;
   }
-  
+
   .number-label {
     min-width: 140px;
   }

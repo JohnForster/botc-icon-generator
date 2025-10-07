@@ -16,6 +16,7 @@ export function App() {
     invertEnabled: false,
     cropEnabled: true,
     horizontalPadding: 0,
+    smoothBlend: false,
   });
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -50,7 +51,8 @@ export function App() {
         options.borderEnabled ? options.borderSize : 0,
         options.invertEnabled,
         options.selectedColor === "traveller" ? options.horizontalPadding : 0,
-        options.cropEnabled
+        options.cropEnabled,
+        options.smoothBlend
       );
       setProcessedImage(result);
       logUsage(selectedFile, {
@@ -89,7 +91,7 @@ export function App() {
       </header>
 
       <main>
-        <div class={`main-layout ${processedImage ? 'has-result' : ''}`}>
+        <div class={`main-layout ${processedImage ? "has-result" : ""}`}>
           <div class="left-panel">
             <ImageSelector
               selectedFile={selectedFile}
@@ -102,7 +104,10 @@ export function App() {
 
             {selectedFile && (
               <>
-                <OptionsSelector options={options} onOptionsChange={setOptions} />
+                <OptionsSelector
+                  options={options}
+                  onOptionsChange={setOptions}
+                />
 
                 <button
                   class="process-btn"

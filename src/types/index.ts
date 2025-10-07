@@ -7,4 +7,5 @@ export interface ProcessingOptions {
   invertEnabled: boolean;
   cropEnabled: boolean;
   horizontalPadding: number;
+  smoothBlend: boolean;
 }

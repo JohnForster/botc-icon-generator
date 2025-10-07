@@ -467,6 +467,7 @@ export const applyTextures = (
   imageData: ImageData,
   whiteTexture: ImageData,
   colorTexture: ImageData,
+  smoothBlend: boolean = true,
   originalImage?: ImageData
 ): ImageData => {
   const { width, height, data } = imageData;
@@ -495,26 +496,52 @@ export const applyTextures = (
       // Skip transparent pixels
       if (a === 0) continue;
 
-      // Determine if pixel is closer to black or white
       const intensity = (r + g + b) / 3;
 
-      let textureToUse: ImageData;
-      if (intensity < 128) {
-        // Closer to black - use color texture
-        textureToUse = scaledColorTexture;
+      // Get texture pixels (no tiling needed since texture is scaled to image size)
+      const textureX = Math.min(x, scaledColorTexture.width - 1);
+      const textureY = Math.min(y, scaledColorTexture.height - 1);
+      const colorTextureIndex = (textureY * scaledColorTexture.width + textureX) * 4;
+      const whiteTextureIndex = (textureY * scaledWhiteTexture.width + textureX) * 4;
+
+      if (smoothBlend) {
+        // Smooth blending based on grayscale intensity
+        const blendRatio = intensity / 255; // Normalize to 0-1 range
+
+        // Get color texture pixel
+        const colorR = scaledColorTexture.data[colorTextureIndex];
+        const colorG = scaledColorTexture.data[colorTextureIndex + 1];
+        const colorB = scaledColorTexture.data[colorTextureIndex + 2];
+
+        // Get white texture pixel
+        const whiteR = scaledWhiteTexture.data[whiteTextureIndex];
+        const whiteG = scaledWhiteTexture.data[whiteTextureIndex + 1];
+        const whiteB = scaledWhiteTexture.data[whiteTextureIndex + 2];
+
+        // Blend between color and white textures based on intensity
+        newData[index] = Math.round(colorR * (1 - blendRatio) + whiteR * blendRatio); // R
+        newData[index + 1] = Math.round(colorG * (1 - blendRatio) + whiteG * blendRatio); // G
+        newData[index + 2] = Math.round(colorB * (1 - blendRatio) + whiteB * blendRatio); // B
       } else {
-        // Closer to white - use white texture
-        textureToUse = scaledWhiteTexture;
+        // Threshold-based approach (traditional)
+        let textureToUse: ImageData;
+        let textureIndex: number;
+
+        if (intensity < 128) {
+          // Closer to black - use color texture
+          textureToUse = scaledColorTexture;
+          textureIndex = colorTextureIndex;
+        } else {
+          // Closer to white - use white texture
+          textureToUse = scaledWhiteTexture;
+          textureIndex = whiteTextureIndex;
+        }
+
+        newData[index] = textureToUse.data[textureIndex]; // R
+        newData[index + 1] = textureToUse.data[textureIndex + 1]; // G
+        newData[index + 2] = textureToUse.data[textureIndex + 2]; // B
       }
 
-      // Get texture pixel (no tiling needed since texture is scaled to image size)
-      const textureX = Math.min(x, textureToUse.width - 1);
-      const textureY = Math.min(y, textureToUse.height - 1);
-      const textureIndex = (textureY * textureToUse.width + textureX) * 4;
-
-      newData[index] = textureToUse.data[textureIndex]; // R
-      newData[index + 1] = textureToUse.data[textureIndex + 1]; // G
-      newData[index + 2] = textureToUse.data[textureIndex + 2]; // B
       newData[index + 3] = a; // Preserve original alpha
     }
   }
@@ -529,7 +556,8 @@ export const processImage = async (
   borderSize: number = 0,
   invert: boolean = false,
   horizontalPadding: number = 0,
-  shouldCrop: boolean = true
+  shouldCrop: boolean = true,
+  smoothBlend: boolean = true
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -583,6 +611,7 @@ export const processImage = async (
     imageData,
     whiteTexture,
     colorTexture,
+    smoothBlend,
     originalImageData
   );
 
