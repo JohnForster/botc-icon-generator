@@ -262,10 +262,10 @@ header p {
   border-radius: 4px;
 
   background: repeating-conic-gradient(
-    #e8e8e8 0% 25%,
-    #ffffff 25% 50%,
-    #e8e8e8 50% 75%,
-    #ffffff 75% 100%
+    #777777 0% 25%,
+    #888888 25% 50%,
+    #777777 50% 75%,
+    #888888 75% 100%
   );
   background-size: 20px 20px;
 }
