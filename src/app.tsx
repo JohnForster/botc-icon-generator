@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useState } from "preact/hooks";
 import "./app.css";
 import { processImage as processImageUtil } from "./utils/imageUtils";
 import { logUsage } from "./utils/logger";
 import type { ProcessingOptions } from "./types";
 import { OptionsSelector } from "./components/OptionsSelector";
+import { ImageSelector } from "./components/ImageSelector";
+import { IconPreview } from "./components/IconPreview";
 
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -19,8 +21,6 @@ export function App() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const resultSectionRef = useRef<HTMLDivElement>(null);
 
   const handleFileSelect = (file: File) => {
     if (file.type.startsWith("image/") || file.type === "image/svg+xml") {
@@ -33,57 +33,11 @@ export function App() {
     }
   };
 
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = e.dataTransfer?.files;
-    if (files && files.length > 0) {
-      handleFileSelect(files[0]);
-    }
+  const handleClearImage = () => {
+    setSelectedFile(null);
+    setPreviewImage(null);
+    setProcessedImage(null);
   };
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleFileInputChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      handleFileSelect(target.files[0]);
-    }
-  };
-
-  const handlePaste = async (e: ClipboardEvent) => {
-    e.preventDefault();
-
-    if (!e.clipboardData) return;
-
-    const items = Array.from(e.clipboardData.items);
-    const imageItem = items.find((item) => item.type.startsWith("image/"));
-
-    if (imageItem) {
-      const file = imageItem.getAsFile();
-      if (file) {
-        handleFileSelect(file);
-      }
-    }
-  };
-
-  // Add paste event listener
-  useEffect(() => {
-    const handlePasteEvent = (e: ClipboardEvent) => handlePaste(e);
-    document.addEventListener("paste", handlePasteEvent);
-
-    return () => {
-      document.removeEventListener("paste", handlePasteEvent);
-    };
-  }, []);
 
   const processImage = async () => {
     if (!selectedFile) return;
@@ -103,14 +57,6 @@ export function App() {
         borderSize: options.borderEnabled ? options.borderSize : 0,
         selectedColour: options.selectedColor,
       });
-
-      // Scroll to result section after processing is complete
-      setTimeout(() => {
-        resultSectionRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 100);
     } catch (error) {
       console.error("Error processing image:", error);
       alert("Failed to process image. Please try again.");
@@ -119,22 +65,13 @@ export function App() {
     }
   };
 
-  const downloadImage = () => {
+  const handleDownloadImage = () => {
     if (!processedImage) return;
 
     const link = document.createElement("a");
     link.href = processedImage;
     link.download = "processed-icon.png";
     link.click();
-  };
-
-  const clearImage = () => {
-    setSelectedFile(null);
-    setPreviewImage(null);
-    setProcessedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
 
   return (
@@ -152,67 +89,34 @@ export function App() {
       </header>
 
       <main>
-        {!selectedFile && (
-          <div class="upload-section">
-            <div
-              class={`upload-area ${isDragOver ? "drag-over" : ""}`}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => fileInputRef.current?.click()}
+        <ImageSelector
+          selectedFile={selectedFile}
+          previewImage={previewImage}
+          isDragOver={isDragOver}
+          onFileSelect={handleFileSelect}
+          onDragOver={setIsDragOver}
+          onClearImage={handleClearImage}
+        />
+
+        {selectedFile && (
+          <>
+            <OptionsSelector options={options} onOptionsChange={setOptions} />
+
+            <button
+              class="process-btn"
+              onClick={processImage}
+              disabled={!selectedFile || isProcessing}
             >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*,.svg"
-                onChange={handleFileInputChange}
-                style={{ display: "none" }}
-              />
-              <div class="upload-prompt">
-                <p>Drop your image here, click to browse, or paste (Ctrl+V)</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedFile && previewImage && (
-          <div class="preview-section">
-            <h3>Original Image</h3>
-            <div class="image-preview">
-              <img src={previewImage} alt="Original uploaded image" />
-            </div>
-            <button class="clear-btn" onClick={clearImage}>
-              Clear Image
+              {isProcessing ? "Processing..." : "Generate Icon"}
             </button>
-          </div>
+          </>
         )}
 
-        <OptionsSelector options={options} onOptionsChange={setOptions} />
-
-        <button
-          class="process-btn"
-          onClick={processImage}
-          disabled={!selectedFile || isProcessing}
-        >
-          {isProcessing ? "Processing..." : "Generate Icon"}
-        </button>
-
-        {processedImage && (
-          <div class="result-section" ref={resultSectionRef}>
-            <h3>Generated Icon</h3>
-            <div class="image-preview">
-              <img src={processedImage} alt="Processed icon" />
-            </div>
-            <button class="download-btn" onClick={downloadImage}>
-              Download PNG
-            </button>
-            <p>
-              <strong>Note:</strong> If using with bloodstar.xyz, make sure to
-              uncheck the "Colorize" and "Texture" options when uploading the
-              image
-            </p>
-          </div>
-        )}
+        <IconPreview
+          processedImage={processedImage}
+          isProcessing={isProcessing}
+          onDownload={handleDownloadImage}
+        />
       </main>
     </div>
   );

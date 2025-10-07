@@ -1,0 +1,142 @@
+.image-selector {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 3px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-tertiary);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-area:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+}
+
+.upload-area.drag-over {
+  border-color: #007bff;
+  background: var(--bg-info);
+  transform: scale(1.02);
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-icon {
+  font-size: 3rem;
+  opacity: 0.6;
+}
+
+.upload-content h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.upload-primary {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.upload-secondary {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Image Preview Section */
+.image-preview-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.image-preview-section h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.image-preview-container {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-input);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.image-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filename {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  word-break: break-all;
+}
+
+.filesize {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.clear-image-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-image-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (min-width: 640px) {
+  .upload-area {
+    padding: 4rem 3rem;
+  }
+
+  .image-info {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+  }
+}
