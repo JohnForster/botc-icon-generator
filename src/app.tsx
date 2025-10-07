@@ -308,6 +308,11 @@ export function App() {
             <button class="download-btn" onClick={downloadImage}>
               Download PNG
             </button>
+            <p>
+              <strong>Note:</strong> If using with Bloodstar.xyz, make sure to
+              uncheck the "Colorize" and "Texture" options when uploading the
+              image
+            </p>
           </div>
         )}
       </main>
