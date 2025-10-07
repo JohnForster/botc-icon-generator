@@ -73,6 +73,20 @@ header p {
 
 /* Main layout and styling */
 main {
+  width: 100%;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.left-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.right-panel {
   display: flex;
   flex-direction: column;
 }
@@ -106,7 +120,33 @@ main {
   transform: none;
 }
 
-/* Responsive design improvements */
+/* Desktop layout - two columns only when there's a processed image */
+@media (min-width: 1024px) {
+  .main-layout.has-result {
+    flex-direction: row;
+    gap: 3rem;
+    align-items: flex-start;
+  }
+
+  .main-layout.has-result .left-panel {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .main-layout.has-result .right-panel {
+    flex: 1;
+    max-width: 500px;
+    position: sticky;
+    top: 2rem;
+  }
+
+  /* Full width upload when no image is processed */
+  .main-layout:not(.has-result) .left-panel {
+    width: 100%;
+  }
+}
+
+/* Mobile responsive design */
 @media (max-width: 640px) {
   .app {
     padding: 1rem;
@@ -125,4 +165,12 @@ main {
   );
   background-size: 20px 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Shared section heading styling */
+.section-title {
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
 }

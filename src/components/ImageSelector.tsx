@@ -76,7 +76,7 @@ export function ImageSelector({
     return (
       <div class="image-selector">
         <div class="image-preview-section">
-          <h3>Selected Image</h3>
+          <h3 class="section-title">Selected Image</h3>
           <div class="image-preview-container">
             <img
               src={previewImage}

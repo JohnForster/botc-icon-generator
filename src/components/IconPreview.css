@@ -1,6 +1,5 @@
 .icon-preview {
   width: 100%;
-  margin-top: 2rem;
 }
 
 .icon-preview.processing {
@@ -29,8 +28,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .processing-content h3 {
@@ -54,13 +57,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.result-content h3 {
-  color: var(--text-primary);
-  margin: 0 0 1.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
 .icon-container {
   background: var(--bg-primary);
   border: 2px solid var(--border-input);
@@ -72,7 +68,7 @@
 }
 
 .icon-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -153,16 +149,16 @@
   .result-content {
     padding: 1.5rem;
   }
-  
+
   .icon-container {
     padding: 1.5rem;
   }
-  
+
   .generated-icon {
     max-width: 250px;
     max-height: 250px;
   }
-  
+
   .btn {
     padding: 0.875rem 1.5rem;
     font-size: 1rem;

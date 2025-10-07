@@ -89,34 +89,40 @@ export function App() {
       </header>
 
       <main>
-        <ImageSelector
-          selectedFile={selectedFile}
-          previewImage={previewImage}
-          isDragOver={isDragOver}
-          onFileSelect={handleFileSelect}
-          onDragOver={setIsDragOver}
-          onClearImage={handleClearImage}
-        />
+        <div class={`main-layout ${processedImage ? 'has-result' : ''}`}>
+          <div class="left-panel">
+            <ImageSelector
+              selectedFile={selectedFile}
+              previewImage={previewImage}
+              isDragOver={isDragOver}
+              onFileSelect={handleFileSelect}
+              onDragOver={setIsDragOver}
+              onClearImage={handleClearImage}
+            />
 
-        {selectedFile && (
-          <>
-            <OptionsSelector options={options} onOptionsChange={setOptions} />
+            {selectedFile && (
+              <>
+                <OptionsSelector options={options} onOptionsChange={setOptions} />
 
-            <button
-              class="process-btn"
-              onClick={processImage}
-              disabled={!selectedFile || isProcessing}
-            >
-              {isProcessing ? "Processing..." : "Generate Icon"}
-            </button>
-          </>
-        )}
+                <button
+                  class="process-btn"
+                  onClick={processImage}
+                  disabled={!selectedFile || isProcessing}
+                >
+                  {isProcessing ? "Processing..." : "Generate Icon"}
+                </button>
+              </>
+            )}
+          </div>
 
-        <IconPreview
-          processedImage={processedImage}
-          isProcessing={isProcessing}
-          onDownload={handleDownloadImage}
-        />
+          <div class="right-panel">
+            <IconPreview
+              processedImage={processedImage}
+              isProcessing={isProcessing}
+              onDownload={handleDownloadImage}
+            />
+          </div>
+        </div>
       </main>
     </div>
   );

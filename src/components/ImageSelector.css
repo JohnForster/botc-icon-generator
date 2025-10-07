@@ -74,12 +74,6 @@
   border: 1px solid var(--border-color);
 }
 
-.image-preview-section h3 {
-  margin: 0 0 1.5rem 0;
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-}
 
 .image-preview-container {
   background: var(--bg-primary);

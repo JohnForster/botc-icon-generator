@@ -45,7 +45,7 @@ export function IconPreview({
   return (
     <div class="icon-preview" ref={resultSectionRef}>
       <div class="result-content">
-        <h3>Generated Icon</h3>
+        <h3 class="section-title">Generated Icon</h3>
         <div class="icon-container">
           <img
             src={processedImage}
