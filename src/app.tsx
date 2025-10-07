@@ -309,7 +309,7 @@ export function App() {
               Download PNG
             </button>
             <p>
-              <strong>Note:</strong> If using with Bloodstar.xyz, make sure to
+              <strong>Note:</strong> If using with bloodstar.xyz, make sure to
               uncheck the "Colorize" and "Texture" options when uploading the
               image
             </p>
