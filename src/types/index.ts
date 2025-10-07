@@ -8,4 +8,5 @@ export interface ProcessingOptions {
   cropEnabled: boolean;
   horizontalPadding: number;
   smoothBlend: boolean;
+  increaseContrast: boolean;
 }

@@ -92,6 +92,20 @@ export function OptionsSelector({
             />
             <span class="checkbox-label">Smooth blend</span>
           </label>
+
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
+              checked={options.increaseContrast}
+              onChange={(e) =>
+                updateOption(
+                  "increaseContrast",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Increase contrast</span>
+          </label>
         </div>
       </section>
 

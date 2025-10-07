@@ -333,6 +333,54 @@ export const ensureGrayscale = (imageData: ImageData): ImageData => {
   return newImageData;
 };
 
+// Increase contrast with dramatic thresholding
+export const increaseContrast = (imageData: ImageData): ImageData => {
+  const { width, height, data } = imageData;
+  const newImageData = new ImageData(width, height);
+  const newData = newImageData.data;
+
+  // Define thresholds (45% and 55% of 255)
+  const lowerThreshold = Math.round(255 * 0.45); // 102
+  const upperThreshold = Math.round(255 * 0.55); // 153
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+
+    // Skip transparent pixels
+    if (a === 0) {
+      newData[i] = r;
+      newData[i + 1] = g;
+      newData[i + 2] = b;
+      newData[i + 3] = a;
+      continue;
+    }
+
+    // Apply dramatic contrast enhancement to each channel
+    const enhanceValue = (value: number): number => {
+      if (value < lowerThreshold) {
+        // Below minimum% - convert to black
+        return 0;
+      } else if (value > upperThreshold) {
+        // Above maximum% - convert to white
+        return 255;
+      } else {
+        // Middle values - preserve original value
+        return value;
+      }
+    };
+
+    newData[i] = enhanceValue(r); // R
+    newData[i + 1] = enhanceValue(g); // G
+    newData[i + 2] = enhanceValue(b); // B
+    newData[i + 3] = a; // A (preserve alpha)
+  }
+
+  return newImageData;
+};
+
 // Invert image colors (excluding transparent areas)
 export const invertImage = (imageData: ImageData): ImageData => {
   const { width, height, data } = imageData;
@@ -501,8 +549,10 @@ export const applyTextures = (
       // Get texture pixels (no tiling needed since texture is scaled to image size)
       const textureX = Math.min(x, scaledColorTexture.width - 1);
       const textureY = Math.min(y, scaledColorTexture.height - 1);
-      const colorTextureIndex = (textureY * scaledColorTexture.width + textureX) * 4;
-      const whiteTextureIndex = (textureY * scaledWhiteTexture.width + textureX) * 4;
+      const colorTextureIndex =
+        (textureY * scaledColorTexture.width + textureX) * 4;
+      const whiteTextureIndex =
+        (textureY * scaledWhiteTexture.width + textureX) * 4;
 
       if (smoothBlend) {
         // Smooth blending based on grayscale intensity
@@ -519,9 +569,15 @@ export const applyTextures = (
         const whiteB = scaledWhiteTexture.data[whiteTextureIndex + 2];
 
         // Blend between color and white textures based on intensity
-        newData[index] = Math.round(colorR * (1 - blendRatio) + whiteR * blendRatio); // R
-        newData[index + 1] = Math.round(colorG * (1 - blendRatio) + whiteG * blendRatio); // G
-        newData[index + 2] = Math.round(colorB * (1 - blendRatio) + whiteB * blendRatio); // B
+        newData[index] = Math.round(
+          colorR * (1 - blendRatio) + whiteR * blendRatio
+        ); // R
+        newData[index + 1] = Math.round(
+          colorG * (1 - blendRatio) + whiteG * blendRatio
+        ); // G
+        newData[index + 2] = Math.round(
+          colorB * (1 - blendRatio) + whiteB * blendRatio
+        ); // B
       } else {
         // Threshold-based approach (traditional)
         let textureToUse: ImageData;
@@ -557,7 +613,8 @@ export const processImage = async (
   invert: boolean = false,
   horizontalPadding: number = 0,
   shouldCrop: boolean = true,
-  smoothBlend: boolean = true
+  smoothBlend: boolean = true,
+  enhanceContrast: boolean = false
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -586,6 +643,11 @@ export const processImage = async (
 
   // Convert to grayscale
   imageData = ensureGrayscale(imageData);
+
+  // Increase contrast if requested (apply after grayscale but before inversion)
+  if (enhanceContrast) {
+    imageData = increaseContrast(imageData);
+  }
 
   // Invert image if requested (apply before border to invert the content)
   if (invert) {

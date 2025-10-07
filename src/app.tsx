@@ -7,17 +7,20 @@ import { OptionsSelector } from "./components/OptionsSelector";
 import { ImageSelector } from "./components/ImageSelector";
 import { IconPreview } from "./components/IconPreview";
 
+const DEFAULT_OPTIONS: ProcessingOptions = {
+  selectedColor: "red",
+  borderSize: 2,
+  borderEnabled: false,
+  invertEnabled: false,
+  cropEnabled: true,
+  horizontalPadding: 0,
+  smoothBlend: true,
+  increaseContrast: true,
+};
+
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [options, setOptions] = useState<ProcessingOptions>({
-    selectedColor: "red",
-    borderSize: 2,
-    borderEnabled: false,
-    invertEnabled: false,
-    cropEnabled: true,
-    horizontalPadding: 0,
-    smoothBlend: false,
-  });
+  const [options, setOptions] = useState<ProcessingOptions>(DEFAULT_OPTIONS);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -52,7 +55,8 @@ export function App() {
         options.invertEnabled,
         options.selectedColor === "traveller" ? options.horizontalPadding : 0,
         options.cropEnabled,
-        options.smoothBlend
+        options.smoothBlend,
+        options.increaseContrast
       );
       setProcessedImage(result);
       logUsage(selectedFile, {
