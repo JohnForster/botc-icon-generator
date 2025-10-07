@@ -1,21 +1,20 @@
 import { useState, useRef, useEffect } from "preact/hooks";
 import "./app.css";
-import {
-  processImage as processImageUtil,
-  type ColorOption,
-  COLOR_LABELS,
-  COLOR_VALUES,
-} from "./utils/imageUtils";
+import { processImage as processImageUtil } from "./utils/imageUtils";
 import { logUsage } from "./utils/logger";
+import type { ProcessingOptions } from "./types";
+import { OptionsSelector } from "./components/OptionsSelector";
 
 export function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorOption>("red");
-  const [borderSize, setBorderSize] = useState<number>(2);
-  const [borderEnabled, setBorderEnabled] = useState<boolean>(false);
-  const [invertEnabled, setInvertEnabled] = useState<boolean>(false);
-  const [cropEnabled, setCropEnabled] = useState<boolean>(true);
-  const [horizontalPadding, setHorizontalPadding] = useState<number>(0);
+  const [options, setOptions] = useState<ProcessingOptions>({
+    selectedColor: "red",
+    borderSize: 2,
+    borderEnabled: false,
+    invertEnabled: false,
+    cropEnabled: true,
+    horizontalPadding: 0,
+  });
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -93,16 +92,16 @@ export function App() {
     try {
       const result = await processImageUtil(
         selectedFile,
-        selectedColor,
-        borderEnabled ? borderSize : 0,
-        invertEnabled,
-        selectedColor === "traveller" ? horizontalPadding : 0,
-        cropEnabled
+        options.selectedColor,
+        options.borderEnabled ? options.borderSize : 0,
+        options.invertEnabled,
+        options.selectedColor === "traveller" ? options.horizontalPadding : 0,
+        options.cropEnabled
       );
       setProcessedImage(result);
       logUsage(selectedFile, {
-        borderSize: borderEnabled ? borderSize : 0,
-        selectedColour: selectedColor,
+        borderSize: options.borderEnabled ? options.borderSize : 0,
+        selectedColour: options.selectedColor,
       });
 
       // Scroll to result section after processing is complete
@@ -188,116 +187,15 @@ export function App() {
           </div>
         )}
 
-        <div class="controls-section">
-          <div class="control-group">
-            <label>Character Type:</label>
-            <div class="color-options">
-              {(["blue", "red", "gold", "traveller"] as ColorOption[]).map(
-                (color) => (
-                  <button
-                    key={color}
-                    class={`color-option ${
-                      color === "traveller" ? "traveller-option" : ""
-                    } ${selectedColor === color ? "selected" : ""}`}
-                    onClick={() => setSelectedColor(color)}
-                    style={
-                      color !== "traveller"
-                        ? {
-                            backgroundColor: COLOR_VALUES[color],
-                          }
-                        : undefined
-                    }
-                  >
-                    {COLOR_LABELS[color]}
-                  </button>
-                )
-              )}
-            </div>
-            <div class="control-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={invertEnabled}
-                  onChange={(e) =>
-                    setInvertEnabled((e.target as HTMLInputElement).checked)
-                  }
-                />
-                Invert colors
-              </label>
-            </div>
+        <OptionsSelector options={options} onOptionsChange={setOptions} />
 
-            <div class="control-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={cropEnabled}
-                  onChange={(e) =>
-                    setCropEnabled((e.target as HTMLInputElement).checked)
-                  }
-                />
-                Crop to content
-              </label>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={borderEnabled}
-                onChange={(e) =>
-                  setBorderEnabled((e.target as HTMLInputElement).checked)
-                }
-              />
-              Add border
-            </label>
-
-            <label for="border-size">Border Size (pixels):</label>
-            <input
-              id="border-size"
-              type="number"
-              min="0"
-              max="20"
-              value={borderSize}
-              disabled={!borderEnabled}
-              onChange={(e) =>
-                setBorderSize(
-                  parseInt((e.target as HTMLInputElement).value) || 0
-                )
-              }
-            />
-          </div>
-
-          {selectedColor === "traveller" && (
-            <div class="control-group">
-              <label for="horizontal-padding">Horizontal Adjustment:</label>
-              <input
-                id="horizontal-padding"
-                type="number"
-                min="-160"
-                max="160"
-                value={horizontalPadding}
-                onChange={(e) =>
-                  setHorizontalPadding(
-                    parseInt((e.target as HTMLInputElement).value) || 0
-                  )
-                }
-              />
-              <br />
-              <small>
-                Positive = right adjustment, Negative = left adjustment
-              </small>
-            </div>
-          )}
-
-          <button
-            class="process-btn"
-            onClick={processImage}
-            disabled={!selectedFile || isProcessing}
-          >
-            {isProcessing ? "Processing..." : "Generate Icon"}
-          </button>
-        </div>
+        <button
+          class="process-btn"
+          onClick={processImage}
+          disabled={!selectedFile || isProcessing}
+        >
+          {isProcessing ? "Processing..." : "Generate Icon"}
+        </button>
 
         {processedImage && (
           <div class="result-section" ref={resultSectionRef}>
