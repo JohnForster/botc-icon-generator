@@ -1,3 +1,7 @@
+/* ========================================
+   CSS CUSTOM PROPERTIES
+   ======================================== */
+
 :root {
   /* Light mode colors */
   --bg-primary: #ffffff;
@@ -47,14 +51,24 @@
   }
 }
 
+/* ========================================
+   APP CONTAINER
+   ======================================== */
+
 .app {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0.5rem;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
 }
+
+/* ========================================
+   HEADER
+   ======================================== */
 
 header {
   text-align: center;
@@ -64,14 +78,46 @@ header {
 header h1 {
   color: var(--text-primary);
   margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+header h2 {
+  font-size: 1rem;
 }
 
 header p {
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
-/* Main layout and styling */
+.page-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 0;
+}
+
+.page-header img {
+  height: 92px;
+  width: 92px;
+}
+
+.header-subheader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-left: 1rem;
+}
+
+.header-subheader h2 {
+  text-wrap-style: balance;
+}
+
+/* ========================================
+   MAIN LAYOUT
+   ======================================== */
+
 main {
   width: 100%;
 }
@@ -91,15 +137,17 @@ main {
   flex-direction: column;
 }
 
-/* Process button styling */
+/* ========================================
+   BUTTONS
+   ======================================== */
 
 .process-btn {
   background: #007bff;
   color: white;
   border: none;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -120,8 +168,69 @@ main {
   transform: none;
 }
 
-/* Desktop layout - two columns only when there's a processed image */
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.transparent-background {
+  max-width: 250px;
+  max-height: 250px;
+  border-radius: 8px;
+  background: repeating-conic-gradient(
+    #777777 0% 25%,
+    #888888 25% 50%,
+    #777777 50% 75%,
+    #888888 75% 100%
+  );
+  background-size: 20px 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ========================================
+   MEDIA QUERIES - TABLET (640px+)
+   ======================================== */
+
+@media (min-width: 640px) {
+  .app {
+    padding: 2rem;
+  }
+
+  .page-header img {
+    height: 128px;
+    width: 128px;
+  }
+
+  .header-subheader {
+    align-items: flex-start;
+    text-align: left;
+    margin-left: 4rem;
+  }
+
+  .process-btn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .transparent-background {
+    max-width: 300px;
+    max-height: 300px;
+  }
+}
+
+/* ========================================
+   MEDIA QUERIES - DESKTOP (1024px+)
+   ======================================== */
+
 @media (min-width: 1024px) {
+  /* Two-column layout when result is shown */
   .main-layout.has-result {
     flex-direction: row;
     gap: 3rem;
@@ -144,57 +253,4 @@ main {
   .main-layout:not(.has-result) .left-panel {
     width: 100%;
   }
-}
-
-/* Mobile responsive design */
-@media (max-width: 640px) {
-  .app {
-    padding: 1rem;
-  }
-}
-
-.transparent-background {
-  max-width: 300px;
-  max-height: 300px;
-  border-radius: 8px;
-  background: repeating-conic-gradient(
-    #777777 0% 25%,
-    #888888 25% 50%,
-    #777777 50% 75%,
-    #888888 75% 100%
-  );
-  background-size: 20px 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Shared section heading styling */
-.section-title {
-  color: var(--text-primary);
-  margin: 0 0 1.5rem 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.page-header img {
-  height: 128px;
-  width: 128px;
-}
-
-.header-subheader {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  margin-left: 4rem;
-}
-
-.header-subheader h2 {
-  text-wrap-style: balance;
 }

@@ -1,6 +1,14 @@
+/* ========================================
+   ICON PREVIEW CONTAINER
+   ======================================== */
+
 .icon-preview {
   width: 100%;
 }
+
+/* ========================================
+   PROCESSING STATE
+   ======================================== */
 
 .icon-preview.processing {
   display: flex;
@@ -47,11 +55,14 @@
   margin: 0;
 }
 
-/* Result Content */
+/* ========================================
+   RESULT CONTENT
+   ======================================== */
+
 .result-content {
   background: var(--bg-secondary);
   border-radius: 12px;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   border: 1px solid var(--border-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -61,10 +72,11 @@
   background: var(--bg-primary);
   border: 2px solid var(--border-input);
   border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
   display: inline-block;
   position: relative;
+  max-width: 100%;
 }
 
 .icon-container::before {
@@ -86,16 +98,22 @@
 }
 
 .generated-icon {
-  max-width: 300px;
-  max-height: 300px;
+  max-width: 100%;
+  width: 200px;
+  height: auto;
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease;
+  display: block;
 }
 
 .generated-icon:hover {
   transform: scale(1.02);
 }
+
+/* ========================================
+   ACTIONS & USAGE NOTE
+   ======================================== */
 
 .result-actions {
   margin-bottom: 1.5rem;
@@ -105,9 +123,9 @@
   background: #007bff;
   color: white;
   border: none;
-  padding: 1rem 2rem;
+  padding: 0.875rem 1.5rem;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -144,23 +162,26 @@
   color: #007bff;
 }
 
-/* Responsive Design */
-@media (max-width: 640px) {
+/* ========================================
+   MEDIA QUERIES - TABLET (640px+)
+   ======================================== */
+
+@media (min-width: 640px) {
   .result-content {
-    padding: 1.5rem;
+    padding: 2rem;
   }
 
   .icon-container {
-    padding: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
   }
 
   .generated-icon {
-    max-width: 250px;
-    max-height: 250px;
+    width: 300px;
   }
 
   .btn {
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
   }
 }
