@@ -32,7 +32,7 @@ export function IconPreview({
         <div class="processing-content">
           <div class="loading-spinner"></div>
           <h3>Processing Your Icon</h3>
-          <p>Applying textures and effects...</p>
+          <p>Background removal can take some time...</p>
         </div>
       </div>
     );
