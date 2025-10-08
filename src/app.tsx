@@ -82,7 +82,15 @@ export function App() {
   return (
     <div class="app">
       <header>
-        <h1>Blood on the Clocktower Character Icon Generator</h1>
+        <div class="page-header">
+          <img src="/artist-icon.png"></img>
+          <div class="header-subheader">
+            <h1>Ravenswood Studio</h1>
+            <h2>
+              A tool for creating icons for custom Blood on the Clocktower roles
+            </h2>
+          </div>
+        </div>
         <p>
           Uploaded images should have a transparent background. Black and white
           images work best.

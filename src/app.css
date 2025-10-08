@@ -175,3 +175,26 @@ main {
   font-weight: 600;
   text-align: center;
 }
+
+.page-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.page-header img {
+  height: 128px;
+  width: 128px;
+}
+
+.header-subheader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin-left: 4rem;
+}
+
+.header-subheader h2 {
+  text-wrap-style: balance;
+}
