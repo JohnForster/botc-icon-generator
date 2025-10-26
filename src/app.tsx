@@ -85,7 +85,7 @@ export function App() {
         <div class="page-header">
           <img src="/artist-icon.png"></img>
           <div class="header-subheader">
-            <h1>Ravenswood Studio</h1>
+            <h1>Clocktower Icon Generator</h1>
             <h2>
               A tool for creating icons for custom Blood on the Clocktower roles
             </h2>
