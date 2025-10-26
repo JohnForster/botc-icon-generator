@@ -276,6 +276,38 @@ export const resizeToSquare = (
   return finalCtx.getImageData(0, 0, targetSize, targetSize);
 };
 
+// Add padding around the entire image edges
+export const addEdgePadding = (
+  imageData: ImageData,
+  padding: number
+): ImageData => {
+  if (padding <= 0) return imageData;
+
+  const { width, height, data } = imageData;
+  const newWidth = width + padding * 2;
+  const newHeight = height + padding * 2;
+
+  // Create new image data with added padding
+  const paddedImageData = new ImageData(newWidth, newHeight);
+  const paddedData = paddedImageData.data;
+
+  // Copy original image data to the center of the new image
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const sourceIndex = (y * width + x) * 4;
+      const targetIndex = ((y + padding) * newWidth + (x + padding)) * 4;
+
+      paddedData[targetIndex] = data[sourceIndex]; // R
+      paddedData[targetIndex + 1] = data[sourceIndex + 1]; // G
+      paddedData[targetIndex + 2] = data[sourceIndex + 2]; // B
+      paddedData[targetIndex + 3] = data[sourceIndex + 3]; // A
+    }
+  }
+
+  // The rest of the canvas is already transparent (ImageData is initialized with zeros)
+  return paddedImageData;
+};
+
 // Add white border around image content (not transparent areas)
 export const addContentBorder = (
   imageData: ImageData,
@@ -685,6 +717,11 @@ export const processImage = async (
 
   // Resize image to be square
   imageData = resizeToSquare(imageData);
+
+  // Add edge padding if border is enabled (ensures border has room and won't be cropped)
+  if (borderSize > 0) {
+    imageData = addEdgePadding(imageData, borderSize);
+  }
 
   // Store original for grayscale handling
   const originalImageData = new ImageData(
