@@ -26,7 +26,7 @@ export function OptionsSelector({
       <section class="options-section">
         <h3>Character Type</h3>
         <div class="character-type-grid">
-          {(["blue", "red", "gold", "traveller"] as ColorOption[]).map(
+          {(["blue", "red", "traveller", "gold", "green"] as ColorOption[]).map(
             (color) => (
               <button
                 key={color}
