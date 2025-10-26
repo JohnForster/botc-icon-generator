@@ -20,30 +20,13 @@
    LINKS
    ======================================== */
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
+/* Removed global a styles to avoid conflicts with site-header */
 
 /* ========================================
    LAYOUT
    ======================================== */
 
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-width: 320px;
-  min-height: 100vh;
-  padding: 1rem 0.5rem;
-  box-sizing: border-box;
-}
+/* Body styles moved to app.css to avoid conflicts with site-header */
 
 #app {
   width: 100%;
@@ -90,10 +73,6 @@ button:focus-visible {
    ======================================== */
 
 @media (min-width: 640px) {
-  body {
-    padding: 2rem 1rem;
-  }
-
   h1 {
     font-size: 3.2em;
   }
