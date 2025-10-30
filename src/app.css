@@ -150,6 +150,11 @@ header p {
   text-wrap-style: balance;
 }
 
+.feedback {
+  margin: 0;
+  font-weight: bold;
+}
+
 /* ========================================
    MAIN LAYOUT
    ======================================== */

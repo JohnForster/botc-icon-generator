@@ -89,6 +89,10 @@ export function App() {
             <h2>
               A tool for creating icons for custom Blood on the Clocktower roles
             </h2>
+            <p className="feedback">
+              ⭐️ If you have any feedback, please let me know{" "}
+              <a href="https://forms.gle/z1yeAW7x91X4Uc4H8">here</a> ⭐️
+            </p>
           </div>
         </div>
         <p>
