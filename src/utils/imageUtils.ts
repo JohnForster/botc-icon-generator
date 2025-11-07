@@ -338,8 +338,11 @@ export const addContentBorder = (
   }
 
   // Dilate the content mask to create border area
+  let lastIterationPixels = new Set<number>();
+
   for (let iteration = 0; iteration < borderSize; iteration++) {
     const newMask = [...contentMask];
+    const currentIterationPixels = new Set<number>();
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
@@ -368,6 +371,7 @@ export const addContentBorder = (
 
         if (hasContentNeighbor) {
           newMask[index] = true;
+          currentIterationPixels.add(index);
           // Add white border pixel
           const pixelIndex = index * 4;
           newData[pixelIndex] = 255; // R
@@ -381,6 +385,39 @@ export const addContentBorder = (
     // Update content mask for next iteration
     for (let i = 0; i < contentMask.length; i++) {
       contentMask[i] = newMask[i];
+    }
+
+    // Track pixels from the last iteration
+    lastIterationPixels = currentIterationPixels;
+  }
+
+  // Antialias the outermost border pixels
+  for (const index of lastIterationPixels) {
+    const x = index % width;
+    const y = Math.floor(index / width);
+
+    // Count neighbors that have any content (original or border)
+    let contentNeighbors = 0;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue; // Skip self
+
+        const nx = x + dx;
+        const ny = y + dy;
+
+        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+          const neighborIndex = ny * width + nx;
+          if (contentMask[neighborIndex]) {
+            contentNeighbors++;
+          }
+        }
+      }
+    }
+
+    // Adjust alpha based on neighbor count
+    const pixelIndex = index * 4;
+    if (contentNeighbors < 5) {
+      newData[pixelIndex + 3] = 128; // 50% opacity for edge pixels
     }
   }
 
