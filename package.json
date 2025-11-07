@@ -22,9 +22,7 @@
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.1.14"
   },
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@7.1.14"
-    }
+  "resolutions": {
+    "vite": "npm:rolldown-vite@7.1.14"
   }
 }
