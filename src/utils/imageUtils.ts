@@ -391,13 +391,9 @@ export const addContentBorder = (
     lastIterationPixels = currentIterationPixels;
   }
 
-  // Antialias the outermost border pixels
-  for (const index of lastIterationPixels) {
-    const x = index % width;
-    const y = Math.floor(index / width);
-
-    // Count neighbors that have any content (original or border)
-    let contentNeighbors = 0;
+  // Helper function to count neighbors based on alpha value
+  const countNeighbors = (x: number, y: number): number => {
+    let score = 0;
     for (let dy = -1; dy <= 1; dy++) {
       for (let dx = -1; dx <= 1; dx++) {
         if (dx === 0 && dy === 0) continue; // Skip self
@@ -406,18 +402,46 @@ export const addContentBorder = (
         const ny = y + dy;
 
         if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-          const neighborIndex = ny * width + nx;
-          if (contentMask[neighborIndex]) {
-            contentNeighbors++;
-          }
+          const neighborIndex = (ny * width + nx) * 4;
+          const neighborAlpha = newData[neighborIndex + 3];
+          score += neighborAlpha / 255;
         }
       }
     }
+    return score;
+  };
 
-    // Adjust alpha based on neighbor count
-    const pixelIndex = index * 4;
-    if (contentNeighbors < 5) {
-      newData[pixelIndex + 3] = 128; // 50% opacity for edge pixels
+  // Define antialiasing passes: [threshold, targetAlpha]
+  const passes: Array<[number, number]> = [
+    [3, 0], // Remove pixels with score <= 3
+    [4.99, 63], // Set pixels with score <= 4.99 to 25%
+    [4.26, 127], // Set pixels with score <= 4.26 to 50%
+    [4.51, 191], // Set pixels with score <= 4.51 to 75%
+  ];
+
+  // Apply each pass
+  for (const [threshold, targetAlpha] of passes) {
+    // First, identify all pixels that should be changed in this pass
+    const pixelsToChange: number[] = [];
+
+    for (const index of lastIterationPixels) {
+      const pixelIndex = index * 4;
+
+      // Only process pixels that are still solid (255 alpha)
+      if (newData[pixelIndex + 3] !== 255) continue;
+
+      const x = index % width;
+      const y = Math.floor(index / width);
+      const neighborScore = countNeighbors(x, y);
+
+      if (neighborScore <= threshold) {
+        pixelsToChange.push(pixelIndex);
+      }
+    }
+
+    // Then, apply all changes at once to avoid domino effects
+    for (const pixelIndex of pixelsToChange) {
+      newData[pixelIndex + 3] = targetAlpha;
     }
   }
 
