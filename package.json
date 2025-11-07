@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
@@ -16,6 +18,7 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.10.2",
     "@types/node": "^24.6.0",
+    "prettier": "^3.6.2",
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.1.14"
   },
