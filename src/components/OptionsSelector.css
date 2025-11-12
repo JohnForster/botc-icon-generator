@@ -36,8 +36,8 @@
    ======================================== */
 
 .character-type-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -51,6 +51,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
+
+  flex-basis: 20%;
+  flex-shrink: 0;
+  flex-grow: 1;
 }
 
 .character-type-btn:hover {
@@ -66,6 +70,16 @@
 
 .character-type-btn.traveller {
   background: linear-gradient(90deg, #047ab7 50%, #8b1011 50%);
+  background-size: 110%;
+  background-position: center;
+}
+.character-type-btn.travellergood {
+  background: linear-gradient(90deg, #047ab7 50%, #876f51 50%);
+  background-size: 110%;
+  background-position: center;
+}
+.character-type-btn.travellerevil {
+  background: linear-gradient(90deg, #876f51 50%, #8b1011 50%);
   background-size: 110%;
   background-position: center;
 }

@@ -1,4 +1,11 @@
-export type ColorOption = "red" | "gold" | "blue" | "green" | "traveller";
+export type ColorOption =
+  | "red"
+  | "gold"
+  | "blue"
+  | "green"
+  | "traveller"
+  | "travellergood"
+  | "travellerevil";
 
 import { removeBackground } from "@imgly/background-removal";
 
@@ -21,6 +28,8 @@ export const COLOR_LABELS: Record<ColorOption, string> = {
   red: "Evil",
   blue: "Good",
   traveller: "Traveller",
+  travellergood: "Traveller (Good)",
+  travellerevil: "Traveller (Evil)",
   gold: "Fabled",
   green: "Loric",
 };
@@ -31,6 +40,8 @@ export const COLOR_VALUES: Record<ColorOption, string> = {
   gold: "#dba318",
   green: "#0f7d3e",
   traveller: "#9b4f9b",
+  travellergood: "#664fff",
+  travellerevil: "#750048ff",
 };
 
 // Convert SVG to PNG using canvas
@@ -813,7 +824,7 @@ export const processImage = async (
   const whiteTexture = await loadTexture(
     `${import.meta.env.BASE_URL}background-white.webp`
   );
-  const colorTextureExt = colorOption === "traveller" ? "png" : "webp";
+  const colorTextureExt = colorOption.includes("traveller") ? "png" : "webp";
   const colorTexture = await loadTexture(
     `${import.meta.env.BASE_URL}background-${colorOption}.${colorTextureExt}`
   );

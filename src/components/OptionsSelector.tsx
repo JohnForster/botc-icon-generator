@@ -56,24 +56,32 @@ export function OptionsSelector({
       <section class="options-section">
         <h3>Character Type</h3>
         <div class="character-type-grid">
-          {(["blue", "red", "traveller", "gold", "green"] as ColorOption[]).map(
-            (color) => (
-              <button
-                key={color}
-                class={`character-type-btn ${
-                  options.selectedColor === color ? "selected" : ""
-                } ${color === "traveller" ? "traveller" : ""}`}
-                onClick={() => updateOption("selectedColor", color)}
-                style={
-                  color !== "traveller"
-                    ? { backgroundColor: COLOR_VALUES[color] }
-                    : undefined
-                }
-              >
-                {COLOR_LABELS[color]}
-              </button>
-            )
-          )}
+          {(
+            [
+              "blue",
+              "red",
+              "traveller",
+              "gold",
+              "green",
+              "travellergood",
+              "travellerevil",
+            ] as ColorOption[]
+          ).map((color) => (
+            <button
+              key={color}
+              class={`character-type-btn ${
+                options.selectedColor === color ? "selected" : ""
+              } ${color.includes("traveller") ? color : ""}`}
+              onClick={() => updateOption("selectedColor", color)}
+              style={
+                !color.includes("traveller")
+                  ? { backgroundColor: COLOR_VALUES[color] }
+                  : undefined
+              }
+            >
+              {COLOR_LABELS[color]}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -179,7 +187,7 @@ export function OptionsSelector({
       </section>
 
       {/* Traveller Adjustment Section */}
-      {options.selectedColor === "traveller" && (
+      {options.selectedColor.includes("traveller") && (
         <section class="options-section">
           <h3>Traveller Adjustment</h3>
           <div class="number-input-group">

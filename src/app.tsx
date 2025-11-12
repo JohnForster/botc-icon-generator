@@ -54,7 +54,9 @@ export function App() {
         options.selectedColor,
         options.borderEnabled ? options.borderSize : 0,
         options.invertEnabled,
-        options.selectedColor === "traveller" ? options.horizontalPadding : 0,
+        options.selectedColor.includes("traveller")
+          ? options.horizontalPadding
+          : 0,
         options.cropEnabled,
         options.smoothBlend,
         options.increaseContrast,

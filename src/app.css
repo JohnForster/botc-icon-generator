@@ -44,6 +44,7 @@ body {
   padding: 0.75rem 1.5rem;
   box-shadow: 0 2px 4px var(--shadow-light);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .site-header a {
@@ -84,6 +85,14 @@ body {
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
+  }
+
+  a:visited {
+    color: #294893;
+  }
+
+  .site-header a:visited {
+    color: #fff;
   }
 }
 
@@ -128,7 +137,7 @@ header p {
 
 .page-header {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   gap: 0;
 }
@@ -166,11 +175,13 @@ main {
 .main-layout {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
+  max-width: 800px;
 }
 
 .right-panel {
@@ -293,5 +304,9 @@ main {
   /* Full width upload when no image is processed */
   .main-layout:not(.has-result) .left-panel {
     width: 100%;
+  }
+
+  .app {
+    max-width: 1200px;
   }
 }
