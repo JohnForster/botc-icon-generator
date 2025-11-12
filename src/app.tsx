@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   cropEnabled: true,
   horizontalPadding: 0,
   smoothBlend: true,
-  increaseContrast: true,
+  increaseContrast: false,
   removeBackground: false,
 };
 

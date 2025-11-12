@@ -21,7 +21,37 @@ export function OptionsSelector({
 
   return (
     <div class="options-selector">
-      <h3 class="section-title">Options</h3>
+      <section class="options-section">
+        <h3>Input Image Type</h3>
+        <div class="processing-options">
+          <label class="checkbox-option">
+            <input
+              type="radio"
+              checked={!options.increaseContrast}
+              onChange={(e) =>
+                updateOption(
+                  "increaseContrast",
+                  !(e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Icon</span>
+          </label>
+          <label class="checkbox-option">
+            <input
+              type="radio"
+              checked={options.increaseContrast}
+              onChange={(e) =>
+                updateOption(
+                  "increaseContrast",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Photo</span>
+          </label>
+        </div>
+      </section>
       {/* Character Type Section */}
       <section class="options-section">
         <h3>Character Type</h3>
@@ -105,20 +135,6 @@ export function OptionsSelector({
               }
             />
             <span class="checkbox-label">Smooth blend</span>
-          </label>
-
-          <label class="checkbox-option">
-            <input
-              type="checkbox"
-              checked={options.increaseContrast}
-              onChange={(e) =>
-                updateOption(
-                  "increaseContrast",
-                  (e.target as HTMLInputElement).checked
-                )
-              }
-            />
-            <span class="checkbox-label">Increase contrast</span>
           </label>
         </div>
       </section>
