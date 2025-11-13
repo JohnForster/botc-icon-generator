@@ -17,6 +17,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   smoothBlend: true,
   increaseContrast: false,
   removeBackground: false,
+  paddingEnabled: true,
 };
 
 export function App() {
@@ -60,7 +61,8 @@ export function App() {
         options.cropEnabled,
         options.smoothBlend,
         options.increaseContrast,
-        options.removeBackground
+        options.removeBackground,
+        options.paddingEnabled
       );
       setProcessedImage(result);
       logUsage(selectedFile, options);

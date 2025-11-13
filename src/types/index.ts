@@ -10,4 +10,5 @@ export interface ProcessingOptions {
   smoothBlend: boolean;
   increaseContrast: boolean;
   removeBackground: boolean;
+  paddingEnabled: boolean;
 }

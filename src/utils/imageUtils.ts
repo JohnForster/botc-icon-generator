@@ -319,6 +319,84 @@ export const addEdgePadding = (
   return paddedImageData;
 };
 
+// Add aspect-ratio-aware padding to make the result square
+export const addAspectRatioPadding = (imageData: ImageData): ImageData => {
+  // Configuration constants - adjust these to change padding behavior
+  const DEFAULT_PADDING_PERCENT = 0.25; // Padding on each side for square images
+  const MIN_PADDING_PERCENT = 0.15; // Minimum padding on any side
+
+  const IMAGE_AREA_PERCENT = 1 - 2 * DEFAULT_PADDING_PERCENT;
+  const SQUARE_SIZE_MULTIPLIER = 1 / IMAGE_AREA_PERCENT;
+  const NON_SQUARE_SIZE_MULTIPLIER = 1 / (2 * IMAGE_AREA_PERCENT);
+  const MIN_CONSTRAINED_IMAGE_RATIO = 1 - 2 * MIN_PADDING_PERCENT;
+
+  const { width, height } = imageData;
+
+  // If already processing a square that came from previous padding, return as-is
+  if (width === height) {
+    // Add default padding on all sides for square images
+    const finalSize = Math.round(width * SQUARE_SIZE_MULTIPLIER);
+    const padding = Math.round((finalSize - width) / 2);
+    return addEdgePadding(imageData, padding);
+  }
+
+  // Calculate ideal final square size based on default average padding
+  let finalSize = Math.round((width + height) * NON_SQUARE_SIZE_MULTIPLIER);
+
+  // Calculate padding in pixels
+  let horizontalPadding = (finalSize - width) / 2;
+  let verticalPadding = (finalSize - height) / 2;
+
+  // Apply minimum padding constraint
+  const minHorizontalPadding = MIN_PADDING_PERCENT * finalSize;
+  const minVerticalPadding = MIN_PADDING_PERCENT * finalSize;
+
+  // Check if we violate the minimum constraint
+  if (horizontalPadding < minHorizontalPadding) {
+    // Horizontal padding is too small, recalculate based on minimum
+    finalSize = Math.round(width / MIN_CONSTRAINED_IMAGE_RATIO);
+    horizontalPadding = (finalSize - width) / 2;
+    verticalPadding = (finalSize - height) / 2;
+  } else if (verticalPadding < minVerticalPadding) {
+    // Vertical padding is too small, recalculate based on minimum
+    finalSize = Math.round(height / MIN_CONSTRAINED_IMAGE_RATIO);
+    horizontalPadding = (finalSize - width) / 2;
+    verticalPadding = (finalSize - height) / 2;
+  }
+
+  // Create new square canvas
+  const paddedImageData = new ImageData(finalSize, finalSize);
+  const paddedData = paddedImageData.data;
+
+  // Fill entire canvas with white (will be textured later)
+  for (let i = 0; i < paddedData.length; i += 4) {
+    paddedData[i] = 255; // R
+    paddedData[i + 1] = 255; // G
+    paddedData[i + 2] = 255; // B
+    paddedData[i + 3] = 0; // A
+  }
+
+  // Calculate offset to center the image
+  const offsetX = Math.round(horizontalPadding);
+  const offsetY = Math.round(verticalPadding);
+
+  // Copy original image data to the center, overwriting the white padding
+  const { data } = imageData;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const sourceIndex = (y * width + x) * 4;
+      const targetIndex = ((y + offsetY) * finalSize + (x + offsetX)) * 4;
+
+      paddedData[targetIndex] = data[sourceIndex]; // R
+      paddedData[targetIndex + 1] = data[sourceIndex + 1]; // G
+      paddedData[targetIndex + 2] = data[sourceIndex + 2]; // B
+      paddedData[targetIndex + 3] = data[sourceIndex + 3]; // A
+    }
+  }
+
+  return paddedImageData;
+};
+
 // Add white border around image content (not transparent areas)
 export const addContentBorder = (
   imageData: ImageData,
@@ -765,7 +843,8 @@ export const processImage = async (
   shouldCrop: boolean = true,
   smoothBlend: boolean = true,
   enhanceContrast: boolean = false,
-  shouldRemoveBackground: boolean = false
+  shouldRemoveBackground: boolean = false,
+  shouldAddPadding: boolean = false
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -841,6 +920,11 @@ export const processImage = async (
   // Crop to content to remove transparent borders (if enabled)
   if (shouldCrop) {
     imageData = cropToContent(imageData);
+  }
+
+  // Add aspect-ratio-aware padding if requested
+  if (shouldAddPadding) {
+    imageData = addAspectRatioPadding(imageData);
   }
 
   // Convert to data URL

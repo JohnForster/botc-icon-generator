@@ -35,7 +35,7 @@ export function OptionsSelector({
                 )
               }
             />
-            <span class="checkbox-label">Icon</span>
+            <span class="checkbox-label">Black & White</span>
           </label>
           <label class="checkbox-option">
             <input
@@ -48,7 +48,7 @@ export function OptionsSelector({
                 )
               }
             />
-            <span class="checkbox-label">Photo</span>
+            <span class="checkbox-label">Greyscale/Colour</span>
           </label>
         </div>
       </section>
@@ -129,6 +129,22 @@ export function OptionsSelector({
               }
             />
             <span class="checkbox-label">Crop to content</span>
+          </label>
+
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
+              checked={options.paddingEnabled}
+              onChange={(e) =>
+                updateOption(
+                  "paddingEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">
+              Add padding (for use with script tools)
+            </span>
           </label>
 
           <label class="checkbox-option">
