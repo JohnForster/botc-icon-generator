@@ -45,6 +45,10 @@ body {
   box-shadow: 0 2px 4px var(--shadow-light);
   width: 100%;
   box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .site-header a {
