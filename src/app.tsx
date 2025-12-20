@@ -6,6 +6,7 @@ import type { ProcessingOptions } from "./types";
 import { OptionsSelector } from "./components/OptionsSelector";
 import { ImageSelector } from "./components/ImageSelector";
 import { IconPreview } from "./components/IconPreview";
+import type { ChangeEvent, ChangeEventHandler } from "preact/compat";
 
 const DEFAULT_OPTIONS: ProcessingOptions = {
   selectedColor: "red",
@@ -18,6 +19,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   increaseContrast: false,
   removeBackground: false,
   paddingEnabled: true,
+  inputImageMode: "auto",
 };
 
 export function App() {
@@ -27,6 +29,7 @@ export function App() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleFileSelect = (file: File) => {
     if (file.type.startsWith("image/") || file.type === "image/svg+xml") {
@@ -36,6 +39,8 @@ export function App() {
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setPreviewImage(previewUrl);
+    } else {
+      alert("Invalid image file. Please select a valid image.");
     }
   };
 
@@ -62,7 +67,8 @@ export function App() {
         options.smoothBlend,
         options.increaseContrast,
         options.removeBackground,
-        options.paddingEnabled
+        options.paddingEnabled,
+        options.inputImageMode
       );
       setProcessedImage(result);
       logUsage(selectedFile, options);
@@ -81,6 +87,11 @@ export function App() {
     link.href = processedImage;
     link.download = "processed-icon.png";
     link.click();
+  };
+
+  const openSearchTab = () => {
+    const url = `https://www.google.com/search?q=${searchQuery.replace(" ", "+")}+vector&udm=2&tbs=itp:lineart,ic:trans`;
+    window.open(url, "_blank")?.focus();
   };
 
   return (
@@ -106,6 +117,20 @@ export function App() {
         <p>
           If background removal doesn't work or isn't very good, use a free tool
           such as <a href="https://www.remove.bg/">https://www.remove.bg/</a>
+        </p>
+        <p>
+          Don't have an image yet? Enter the object you want to use here:{" "}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) =>
+              setSearchQuery((e.target as HTMLInputElement).value)
+            }
+            placeholder="e.g. sword, book, crown"
+          ></input>
+          <button class="search-btn" onClick={openSearchTab}>
+            Search
+          </button>
         </p>
       </header>
 

@@ -224,6 +224,18 @@ main {
   transform: none;
 }
 
+.search-btn {
+  margin-left: 0.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 /* ========================================
    UTILITIES
    ======================================== */

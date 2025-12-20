@@ -27,28 +27,46 @@ export function OptionsSelector({
           <label class="checkbox-option">
             <input
               type="radio"
-              checked={!options.increaseContrast}
-              onChange={(e) =>
-                updateOption(
-                  "increaseContrast",
-                  !(e.target as HTMLInputElement).checked
-                )
-              }
+              name="inputImageMode"
+              checked={options.inputImageMode === "black-white"}
+              onChange={() => {
+                onOptionsChange({
+                  ...options,
+                  inputImageMode: "black-white",
+                  increaseContrast: false,
+                });
+              }}
             />
             <span class="checkbox-label">Black & White</span>
           </label>
           <label class="checkbox-option">
             <input
               type="radio"
-              checked={options.increaseContrast}
-              onChange={(e) =>
-                updateOption(
-                  "increaseContrast",
-                  (e.target as HTMLInputElement).checked
-                )
-              }
+              name="inputImageMode"
+              checked={options.inputImageMode === "greyscale"}
+              onChange={() => {
+                onOptionsChange({
+                  ...options,
+                  inputImageMode: "greyscale",
+                  increaseContrast: true,
+                });
+              }}
             />
             <span class="checkbox-label">Greyscale/Colour</span>
+          </label>
+          <label class="checkbox-option">
+            <input
+              type="radio"
+              name="inputImageMode"
+              checked={options.inputImageMode === "auto"}
+              onChange={() => {
+                onOptionsChange({
+                  ...options,
+                  inputImageMode: "auto",
+                });
+              }}
+            />
+            <span class="checkbox-label">Detect</span>
           </label>
         </div>
       </section>

@@ -322,8 +322,8 @@ export const addEdgePadding = (
 // Add aspect-ratio-aware padding to make the result square
 export const addAspectRatioPadding = (imageData: ImageData): ImageData => {
   // Configuration constants - adjust these to change padding behavior
-  const DEFAULT_PADDING_PERCENT = 0.25; // Padding on each side for square images
-  const MIN_PADDING_PERCENT = 0.15; // Minimum padding on any side
+  const DEFAULT_PADDING_PERCENT = 0.2; // Padding on each side for square images
+  const MIN_PADDING_PERCENT = 0.12; // Minimum padding on any side
 
   const IMAGE_AREA_PERCENT = 1 - 2 * DEFAULT_PADDING_PERCENT;
   const SQUARE_SIZE_MULTIPLIER = 1 / IMAGE_AREA_PERCENT;
@@ -833,6 +833,49 @@ export const applyTextures = (
   return newImageData;
 };
 
+// Detect if an image is predominantly two-tone (black & white with noise tolerance)
+// Returns true if the image is two-tone, false if it's greyscale or color
+export const isTwoToneImage = (imageData: ImageData): boolean => {
+  // Configuration constants
+  const BLACK_WHITE_TOLERANCE = 30; // How close to pure black/white (0-255)
+  const TWO_TONE_THRESHOLD = 0.85; // 85% of pixels must be near black or white
+
+  const { data } = imageData;
+  let twoTonePixelCount = 0;
+  let totalNonTransparentPixels = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+
+    // Skip transparent pixels
+    if (a < 10) continue;
+
+    totalNonTransparentPixels++;
+
+    // Calculate grayscale value (simple average is sufficient for detection)
+    const gray = (r + g + b) / 3;
+
+    // Check if pixel is close to black or white
+    const isNearBlack = gray <= BLACK_WHITE_TOLERANCE;
+    const isNearWhite = gray >= 255 - BLACK_WHITE_TOLERANCE;
+
+    if (isNearBlack || isNearWhite) {
+      twoTonePixelCount++;
+    }
+  }
+
+  // Avoid division by zero
+  if (totalNonTransparentPixels === 0) {
+    return false;
+  }
+
+  const twoToneRatio = twoTonePixelCount / totalNonTransparentPixels;
+  return twoToneRatio >= TWO_TONE_THRESHOLD;
+};
+
 // Main processing function
 export const processImage = async (
   file: File,
@@ -844,7 +887,8 @@ export const processImage = async (
   smoothBlend: boolean = true,
   enhanceContrast: boolean = false,
   shouldRemoveBackground: boolean = false,
-  shouldAddPadding: boolean = false
+  shouldAddPadding: boolean = false,
+  inputImageMode: "black-white" | "greyscale" | "auto" = "auto"
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -884,8 +928,22 @@ export const processImage = async (
   // Convert to grayscale
   imageData = ensureGrayscale(imageData);
 
+  // Determine whether to apply contrast enhancement based on input mode
+  let shouldEnhanceContrast = enhanceContrast;
+  if (inputImageMode === "auto") {
+    // Auto-detect if image is two-tone (black & white) or greyscale/color
+    const isTwoTone = isTwoToneImage(imageData);
+    // If two-tone, don't enhance contrast (keep it as-is)
+    // If greyscale/color, enhance contrast to push towards black & white
+    shouldEnhanceContrast = !isTwoTone;
+  } else if (inputImageMode === "black-white") {
+    shouldEnhanceContrast = false;
+  } else if (inputImageMode === "greyscale") {
+    shouldEnhanceContrast = true;
+  }
+
   // Increase contrast if requested (apply after grayscale but before inversion)
-  if (enhanceContrast) {
+  if (shouldEnhanceContrast) {
     imageData = increaseContrast(imageData);
   }
 

@@ -71,3 +71,28 @@ The app processes images in this sequence:
 - Class attributes use `class` instead of `className` (Preact convention)
 - Texture images are located in `/public/background-{color}.webp`
 - All image processing happens client-side using HTML5 Canvas and ImageData APIs
+
+## Coding Preferences
+
+### Constants Over Magic Numbers
+
+**Always extract magic constants into named variables at the top of a function or module, rather than using inline numeric literals with comments.**
+
+**Why:** Named constants make code more maintainable and easier to tune without having to understand complex formulas.
+
+**Example:**
+```typescript
+// ❌ Don't do this
+const finalSize = Math.round(width * 2.5); // width / 0.4 = 2.5
+
+// ✅ Do this instead
+const IMAGE_AREA_PERCENT = 0.4;
+const SQUARE_SIZE_MULTIPLIER = 1 / IMAGE_AREA_PERCENT; // 2.5
+const finalSize = Math.round(width * SQUARE_SIZE_MULTIPLIER);
+```
+
+This applies especially to:
+- Percentage values and ratios
+- Scaling factors and multipliers
+- Threshold values
+- Size and dimension calculations

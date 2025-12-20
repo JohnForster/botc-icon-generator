@@ -49,7 +49,10 @@ export function ImageSelector({
   const handlePaste = async (e: ClipboardEvent) => {
     e.preventDefault();
 
-    if (!e.clipboardData) return;
+    if (!e.clipboardData) {
+      console.log("no clipboard data");
+      return;
+    }
 
     const items = Array.from(e.clipboardData.items);
     const imageItem = items.find((item) => item.type.startsWith("image/"));
