@@ -14,4 +14,5 @@ export interface ProcessingOptions {
   removeBackground: boolean;
   paddingEnabled: boolean;
   inputImageMode: InputImageMode;
+  dropShadowEnabled: boolean;
 }

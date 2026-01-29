@@ -322,8 +322,8 @@ export const addEdgePadding = (
 // Add aspect-ratio-aware padding to make the result square
 export const addAspectRatioPadding = (imageData: ImageData): ImageData => {
   // Configuration constants - adjust these to change padding behavior
-  const DEFAULT_PADDING_PERCENT = 0.2; // Padding on each side for square images
-  const MIN_PADDING_PERCENT = 0.12; // Minimum padding on any side
+  const DEFAULT_PADDING_PERCENT = 0.25; // Padding on each side for square images
+  const MIN_PADDING_PERCENT = 0.16; // Minimum padding on any side
 
   const IMAGE_AREA_PERCENT = 1 - 2 * DEFAULT_PADDING_PERCENT;
   const SQUARE_SIZE_MULTIPLIER = 1 / IMAGE_AREA_PERCENT;
@@ -833,6 +833,56 @@ export const applyTextures = (
   return newImageData;
 };
 
+// Apply drop shadow to an image using canvas filter
+export const applyDropShadow = (imageData: ImageData): ImageData => {
+  const OFFSET_PC = 1;
+  const BLUR_PC = 2;
+  const OPACITY = 0.2;
+
+  let averageDimension = (imageData.width + imageData.height) / 2;
+  const shadow_offset_x = Math.floor((averageDimension * OFFSET_PC) / 100);
+  const shadow_offset_y = Math.floor((averageDimension * OFFSET_PC) / 100);
+  const shadow_blur = Math.floor((averageDimension * BLUR_PC) / 100);
+  const shadow_colour = `rgba(0, 0, 0, ${OPACITY})`;
+
+  // Calculate extra space needed for shadow
+  const extraSpace =
+    shadow_blur * 2 + Math.max(shadow_offset_x, shadow_offset_y);
+
+  const { width, height } = imageData;
+  const newWidth = width + extraSpace;
+  const newHeight = height + extraSpace;
+
+  // Create source canvas with original image
+  const sourceCanvas = document.createElement("canvas");
+  const sourceCtx = sourceCanvas.getContext("2d");
+  if (!sourceCtx) {
+    throw new Error("Could not get source canvas context");
+  }
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  sourceCtx.putImageData(imageData, 0, 0);
+
+  // Create destination canvas with extra space for shadow
+  const destCanvas = document.createElement("canvas");
+  const destCtx = destCanvas.getContext("2d");
+  if (!destCtx) {
+    throw new Error("Could not get destination canvas context");
+  }
+  destCanvas.width = newWidth;
+  destCanvas.height = newHeight;
+
+  // Apply drop shadow filter and draw the image
+  destCtx.filter = `drop-shadow(${shadow_offset_x}px ${shadow_offset_y}px ${shadow_blur}px ${shadow_colour})`;
+
+  // Center the image in the new canvas (leaving room for shadow on all sides)
+  const offsetX = Math.floor((extraSpace - shadow_offset_x) / 2);
+  const offsetY = Math.floor((extraSpace - shadow_offset_y) / 2);
+  destCtx.drawImage(sourceCanvas, offsetX, offsetY);
+
+  return destCtx.getImageData(0, 0, newWidth, newHeight);
+};
+
 // Detect if an image is predominantly two-tone (black & white with noise tolerance)
 // Returns true if the image is two-tone, false if it's greyscale or color
 export const isTwoToneImage = (imageData: ImageData): boolean => {
@@ -888,7 +938,8 @@ export const processImage = async (
   enhanceContrast: boolean = false,
   shouldRemoveBackground: boolean = false,
   shouldAddPadding: boolean = false,
-  inputImageMode: "black-white" | "greyscale" | "auto" = "auto"
+  inputImageMode: "black-white" | "greyscale" | "auto" = "auto",
+  shouldApplyDropShadow: boolean = false
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -978,6 +1029,11 @@ export const processImage = async (
   // Crop to content to remove transparent borders (if enabled)
   if (shouldCrop) {
     imageData = cropToContent(imageData);
+  }
+
+  // Apply drop shadow if requested (after cropping, before final padding)
+  if (shouldApplyDropShadow) {
+    imageData = applyDropShadow(imageData);
   }
 
   // Add aspect-ratio-aware padding if requested

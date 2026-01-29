@@ -6,7 +6,6 @@ import type { ProcessingOptions } from "./types";
 import { OptionsSelector } from "./components/OptionsSelector";
 import { ImageSelector } from "./components/ImageSelector";
 import { IconPreview } from "./components/IconPreview";
-import type { ChangeEvent, ChangeEventHandler } from "preact/compat";
 
 const DEFAULT_OPTIONS: ProcessingOptions = {
   selectedColor: "red",
@@ -20,6 +19,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   removeBackground: false,
   paddingEnabled: true,
   inputImageMode: "auto",
+  dropShadowEnabled: true,
 };
 
 export function App() {
@@ -68,7 +68,8 @@ export function App() {
         options.increaseContrast,
         options.removeBackground,
         options.paddingEnabled,
-        options.inputImageMode
+        options.inputImageMode,
+        options.dropShadowEnabled
       );
       setProcessedImage(result);
       logUsage(selectedFile, options);

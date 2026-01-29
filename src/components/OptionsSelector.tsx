@@ -178,6 +178,20 @@ export function OptionsSelector({
             />
             <span class="checkbox-label">Smooth blend</span>
           </label>
+
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
+              checked={options.dropShadowEnabled}
+              onChange={(e) =>
+                updateOption(
+                  "dropShadowEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Drop shadow</span>
+          </label>
         </div>
       </section>
 
