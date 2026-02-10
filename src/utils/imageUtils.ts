@@ -48,9 +48,9 @@ export const TEXTURE_PATHS: Record<ColorOption | "white", string> = {
   white: `${import.meta.env.BASE_URL}new-white.png`,
   red: `${import.meta.env.BASE_URL}new-evil.png`,
   blue: `${import.meta.env.BASE_URL}new-good.png`,
-  traveller: `${import.meta.env.BASE_URL}background-travellerevil.png`,
-  travellergood: `${import.meta.env.BASE_URL}background-travellergood.png`,
-  travellerevil: `${import.meta.env.BASE_URL}background-traveller.png`,
+  traveller: `${import.meta.env.BASE_URL}new-traveller.png`,
+  travellergood: `${import.meta.env.BASE_URL}new-travellergood.png`,
+  travellerevil: `${import.meta.env.BASE_URL}new-travellerevil.png`,
   gold: `${import.meta.env.BASE_URL}new-fabled.png`,
   green: `${import.meta.env.BASE_URL}new-loric.png`,
 };
