@@ -15,4 +15,6 @@ export interface ProcessingOptions {
   paddingEnabled: boolean;
   inputImageMode: InputImageMode;
   dropShadowEnabled: boolean;
+  outputSizeEnabled: boolean;
+  outputSize: number;
 }

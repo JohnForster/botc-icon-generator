@@ -17,9 +17,9 @@ This is an icon generator web application that transforms black and white vector
 
 ## Development Commands
 
-- `pnpm dev` - Start development server with hot module replacement
-- `pnpm build` - Build for production (runs TypeScript compiler then Vite build)
-- `pnpm preview` - Preview the production build locally
+- `bun dev` - Start development server with hot module replacement
+- `bun build` - Build for production (runs TypeScript compiler then Vite build)
+- `bun preview` - Preview the production build locally
 
 ## Architecture
 
@@ -28,7 +28,7 @@ This is an icon generator web application that transforms black and white vector
 - **Frontend Framework**: Preact (React-like library with smaller bundle size)
 - **Build Tool**: Vite (using rolldown-vite variant for performance)
 - **Language**: TypeScript
-- **Package Manager**: pnpm
+- **Package Manager**: bun
 
 ### Project Structure
 
@@ -81,6 +81,7 @@ The app processes images in this sequence:
 **Why:** Named constants make code more maintainable and easier to tune without having to understand complex formulas.
 
 **Example:**
+
 ```typescript
 // ❌ Don't do this
 const finalSize = Math.round(width * 2.5); // width / 0.4 = 2.5
@@ -92,6 +93,7 @@ const finalSize = Math.round(width * SQUARE_SIZE_MULTIPLIER);
 ```
 
 This applies especially to:
+
 - Percentage values and ratios
 - Scaling factors and multipliers
 - Threshold values

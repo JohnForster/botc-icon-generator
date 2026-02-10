@@ -20,6 +20,8 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   paddingEnabled: true,
   inputImageMode: "auto",
   dropShadowEnabled: true,
+  outputSizeEnabled: true,
+  outputSize: 800,
 };
 
 export function App() {
@@ -69,7 +71,8 @@ export function App() {
         options.removeBackground,
         options.paddingEnabled,
         options.inputImageMode,
-        options.dropShadowEnabled
+        options.dropShadowEnabled,
+        options.outputSizeEnabled ? options.outputSize : null
       );
       setProcessedImage(result);
       logUsage(selectedFile, options);

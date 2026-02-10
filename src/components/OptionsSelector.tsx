@@ -234,6 +234,48 @@ export function OptionsSelector({
         </div>
       </section>
 
+      {/* Output Size Section */}
+      <section class="options-section">
+        <h3>Output Size</h3>
+        <div class="border-options">
+          <label class="checkbox-option">
+            <input
+              type="checkbox"
+              checked={options.outputSizeEnabled}
+              onChange={(e) =>
+                updateOption(
+                  "outputSizeEnabled",
+                  (e.target as HTMLInputElement).checked
+                )
+              }
+            />
+            <span class="checkbox-label">Set output size</span>
+          </label>
+
+          {options.outputSizeEnabled && (
+            <div class="number-input-group">
+              <label class="number-label">Size (pixels)</label>
+              <input
+                type="number"
+                min="100"
+                max="4000"
+                value={options.outputSize}
+                onChange={(e) =>
+                  updateOption(
+                    "outputSize",
+                    parseInt((e.target as HTMLInputElement).value) || 800
+                  )
+                }
+                class="number-input"
+              />
+              <small class="input-hint">
+                Largest dimension of the output image
+              </small>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Traveller Adjustment Section */}
       {options.selectedColor.includes("traveller") && (
         <section class="options-section">

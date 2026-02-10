@@ -8,6 +8,7 @@ export type ColorOption =
   | "travellerevil";
 
 import { removeBackground } from "@imgly/background-removal";
+import Pica from "pica";
 
 // Cache for background removal results
 interface BackgroundRemovalCache {
@@ -194,6 +195,48 @@ export const loadTexture = (texturePath: string): Promise<ImageData> => {
       reject(new Error(`Failed to load texture: ${texturePath}`));
     img.src = texturePath;
   });
+};
+
+const pica = new Pica();
+
+// High-quality resize using Pica so largest dimension equals targetSize, preserving aspect ratio
+export const picaResize = async (
+  imageData: ImageData,
+  targetSize: number
+): Promise<ImageData> => {
+  const { width, height } = imageData;
+  const largestDimension = Math.max(width, height);
+
+  if (largestDimension === targetSize) {
+    return imageData;
+  }
+
+  const scale = targetSize / largestDimension;
+  const newWidth = Math.round(width * scale);
+  const newHeight = Math.round(height * scale);
+
+  // Create source canvas
+  const sourceCanvas = document.createElement("canvas");
+  const sourceCtx = sourceCanvas.getContext("2d");
+  if (!sourceCtx) {
+    throw new Error("Could not get source canvas context");
+  }
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  sourceCtx.putImageData(imageData, 0, 0);
+
+  // Create destination canvas
+  const destCanvas = document.createElement("canvas");
+  destCanvas.width = newWidth;
+  destCanvas.height = newHeight;
+
+  await pica.resize(sourceCanvas, destCanvas);
+
+  const destCtx = destCanvas.getContext("2d");
+  if (!destCtx) {
+    throw new Error("Could not get destination canvas context");
+  }
+  return destCtx.getImageData(0, 0, newWidth, newHeight);
 };
 
 // Scale texture to match target dimensions while maintaining square aspect ratio
@@ -860,7 +903,8 @@ export const processImage = async (
   shouldRemoveBackground: boolean = false,
   shouldAddPadding: boolean = false,
   inputImageMode: "black-white" | "greyscale" | "auto" = "auto",
-  shouldApplyDropShadow: boolean = false
+  shouldApplyDropShadow: boolean = false,
+  targetOutputSize: number | null = null
 ): Promise<string> => {
   // Convert SVG to PNG if necessary
   let processFile = file;
@@ -876,6 +920,14 @@ export const processImage = async (
 
   // Convert file to ImageData
   let imageData = await fileToImageData(processFile);
+
+  // If target output size is set and image is smaller, upscale before processing
+  if (targetOutputSize != null) {
+    const largestDimension = Math.max(imageData.width, imageData.height);
+    if (largestDimension < targetOutputSize) {
+      imageData = await picaResize(imageData, targetOutputSize);
+    }
+  }
 
   // Add horizontal padding if specified (for Traveller characters)
   if (horizontalPadding !== 0) {
@@ -955,6 +1007,14 @@ export const processImage = async (
   // Add aspect-ratio-aware padding if requested
   if (shouldAddPadding) {
     imageData = addAspectRatioPadding(imageData);
+  }
+
+  // Final resize to exact target output size
+  if (targetOutputSize != null) {
+    const largestDimension = Math.max(imageData.width, imageData.height);
+    if (largestDimension !== targetOutputSize) {
+      imageData = await picaResize(imageData, targetOutputSize);
+    }
   }
 
   // Convert to data URL
