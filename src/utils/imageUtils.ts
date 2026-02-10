@@ -44,6 +44,17 @@ export const COLOR_VALUES: Record<ColorOption, string> = {
   travellerevil: "#750048ff",
 };
 
+export const TEXTURE_PATHS: Record<ColorOption | "white", string> = {
+  white: `${import.meta.env.BASE_URL}new-white.png`,
+  red: `${import.meta.env.BASE_URL}new-evil.png`,
+  blue: `${import.meta.env.BASE_URL}new-good.png`,
+  traveller: `${import.meta.env.BASE_URL}background-travellerevil.png`,
+  travellergood: `${import.meta.env.BASE_URL}background-travellergood.png`,
+  travellerevil: `${import.meta.env.BASE_URL}background-traveller.png`,
+  gold: `${import.meta.env.BASE_URL}new-fabled.png`,
+  green: `${import.meta.env.BASE_URL}new-loric.png`,
+};
+
 // Convert SVG to PNG using canvas
 export const svgToPng = (svgFile: File): Promise<Blob> => {
   return new Promise((resolve, reject) => {
@@ -919,13 +930,8 @@ export const processImage = async (
   }
 
   // Load textures
-  const whiteTexture = await loadTexture(
-    `${import.meta.env.BASE_URL}background-white.webp`
-  );
-  const colorTextureExt = colorOption.includes("traveller") ? "png" : "webp";
-  const colorTexture = await loadTexture(
-    `${import.meta.env.BASE_URL}background-${colorOption}.${colorTextureExt}`
-  );
+  const whiteTexture = await loadTexture(TEXTURE_PATHS.white);
+  const colorTexture = await loadTexture(TEXTURE_PATHS[colorOption]);
 
   // Apply textures
   imageData = applyTextures(
