@@ -397,144 +397,54 @@ export const addAspectRatioPadding = (imageData: ImageData): ImageData => {
   return paddedImageData;
 };
 
-// Add white border around image content (not transparent areas)
+// Add white border around image content using drop-shadow technique
 export const addContentBorder = (
   imageData: ImageData,
   borderSize: number
 ): ImageData => {
   if (borderSize <= 0) return imageData;
 
-  const { width, height, data } = imageData;
-  const newImageData = new ImageData(width, height);
-  const newData = newImageData.data;
+  // Configuration constants
+  const NUM_DIRECTIONS = 16; // Number of shadow directions for smooth border
 
-  // Copy original image data
-  for (let i = 0; i < data.length; i++) {
-    newData[i] = data[i];
+  const { width, height } = imageData;
+
+  // Create source canvas with original image
+  const sourceCanvas = document.createElement("canvas");
+  const sourceCtx = sourceCanvas.getContext("2d");
+  if (!sourceCtx) {
+    throw new Error("Could not get source canvas context");
+  }
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  sourceCtx.putImageData(imageData, 0, 0);
+
+  // Create destination canvas (same size - we already have edge padding)
+  const destCanvas = document.createElement("canvas");
+  const destCtx = destCanvas.getContext("2d");
+  if (!destCtx) {
+    throw new Error("Could not get destination canvas context");
+  }
+  destCanvas.width = width;
+  destCanvas.height = height;
+
+  // Set up white shadow with no blur for crisp border
+  destCtx.shadowColor = "white";
+  destCtx.shadowBlur = 0;
+
+  // Draw image multiple times with offsets in a circle to create border
+  for (let i = 0; i < NUM_DIRECTIONS; i++) {
+    const angle = (i / NUM_DIRECTIONS) * Math.PI * 2;
+    destCtx.shadowOffsetX = Math.cos(angle) * borderSize;
+    destCtx.shadowOffsetY = Math.sin(angle) * borderSize;
+    destCtx.drawImage(sourceCanvas, 0, 0);
   }
 
-  // Create a mask of the original content (non-transparent pixels)
-  const ALPHA_THRESHOLD = 0.8 * 255;
-  const contentMask = new Array(width * height).fill(false);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const index = y * width + x;
-      const alphaIndex = index * 4 + 3;
-      if (data[alphaIndex] > ALPHA_THRESHOLD) {
-        contentMask[index] = true;
-      }
-    }
-  }
+  // Draw the actual image on top (without shadow)
+  destCtx.shadowColor = "transparent";
+  destCtx.drawImage(sourceCanvas, 0, 0);
 
-  // Dilate the content mask to create border area
-  let lastIterationPixels = new Set<number>();
-
-  for (let iteration = 0; iteration < borderSize; iteration++) {
-    const newMask = [...contentMask];
-    const currentIterationPixels = new Set<number>();
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const index = y * width + x;
-
-        // Skip if already part of content
-        if (contentMask[index]) continue;
-
-        // Check if any neighbor is content
-        let hasContentNeighbor = false;
-        for (let dy = -1; dy <= 1; dy++) {
-          for (let dx = -1; dx <= 1; dx++) {
-            const nx = x + dx;
-            const ny = y + dy;
-
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-              const neighborIndex = ny * width + nx;
-              if (contentMask[neighborIndex]) {
-                hasContentNeighbor = true;
-                break;
-              }
-            }
-          }
-          if (hasContentNeighbor) break;
-        }
-
-        if (hasContentNeighbor) {
-          newMask[index] = true;
-          currentIterationPixels.add(index);
-          // Add white border pixel
-          const pixelIndex = index * 4;
-          newData[pixelIndex] = 255; // R
-          newData[pixelIndex + 1] = 255; // G
-          newData[pixelIndex + 2] = 255; // B
-          newData[pixelIndex + 3] = 255; // A
-        }
-      }
-    }
-
-    // Update content mask for next iteration
-    for (let i = 0; i < contentMask.length; i++) {
-      contentMask[i] = newMask[i];
-    }
-
-    // Track pixels from the last iteration
-    lastIterationPixels = currentIterationPixels;
-  }
-
-  // Helper function to count neighbors based on alpha value
-  const countNeighbors = (x: number, y: number): number => {
-    let score = 0;
-    for (let dy = -1; dy <= 1; dy++) {
-      for (let dx = -1; dx <= 1; dx++) {
-        if (dx === 0 && dy === 0) continue; // Skip self
-
-        const nx = x + dx;
-        const ny = y + dy;
-
-        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-          const neighborIndex = (ny * width + nx) * 4;
-          const neighborAlpha = newData[neighborIndex + 3];
-          score += neighborAlpha / 255;
-        }
-      }
-    }
-    return score;
-  };
-
-  // Define antialiasing passes: [threshold, targetAlpha]
-  const passes: Array<[number, number]> = [
-    [3, 0], // Remove pixels with score <= 3
-    [4.99, 63], // Set pixels with score <= 4.99 to 25%
-    [4.26, 127], // Set pixels with score <= 4.26 to 50%
-    [4.51, 191], // Set pixels with score <= 4.51 to 75%
-  ];
-
-  // Apply each pass
-  for (const [threshold, targetAlpha] of passes) {
-    // First, identify all pixels that should be changed in this pass
-    const pixelsToChange: number[] = [];
-
-    for (const index of lastIterationPixels) {
-      const pixelIndex = index * 4;
-
-      // Only process pixels that are still solid (255 alpha)
-      if (newData[pixelIndex + 3] !== 255) continue;
-
-      const x = index % width;
-      const y = Math.floor(index / width);
-      const neighborScore = countNeighbors(x, y);
-
-      if (neighborScore <= threshold) {
-        pixelsToChange.push(pixelIndex);
-      }
-    }
-
-    // Then, apply all changes at once to avoid domino effects
-    for (const pixelIndex of pixelsToChange) {
-      newData[pixelIndex + 3] = targetAlpha;
-    }
-  }
-
-  return newImageData;
+  return destCtx.getImageData(0, 0, width, height);
 };
 
 // Convert image to grayscale if it's not already black and white
