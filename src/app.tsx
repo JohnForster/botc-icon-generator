@@ -16,6 +16,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   horizontalPadding: 0,
   smoothBlend: true,
   increaseContrast: false,
+  contrastThreshold: 50,
   removeBackground: false,
   paddingEnabled: true,
   inputImageMode: "auto",
@@ -71,6 +72,7 @@ export function App() {
         options.removeBackground,
         options.paddingEnabled,
         options.inputImageMode,
+        options.contrastThreshold,
         options.dropShadowEnabled,
         options.outputSizeEnabled ? options.outputSize : null
       );

@@ -179,6 +179,27 @@ export function OptionsSelector({
             <span class="checkbox-label">Smooth blend</span>
           </label>
 
+          {options.inputImageMode !== "black-white" && (
+            <div class="slider-option">
+              <label class="slider-label">
+                Black/white threshold: {options.contrastThreshold}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={options.contrastThreshold}
+                onInput={(e) =>
+                  updateOption(
+                    "contrastThreshold",
+                    parseInt((e.target as HTMLInputElement).value)
+                  )
+                }
+                class="range-slider"
+              />
+            </div>
+          )}
+
           <label class="checkbox-option">
             <input
               type="checkbox"

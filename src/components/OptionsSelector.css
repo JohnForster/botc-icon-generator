@@ -178,6 +178,30 @@
 }
 
 /* ========================================
+   SLIDER / RANGE INPUT
+   ======================================== */
+
+.slider-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0;
+}
+
+.slider-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.range-slider {
+  width: 100%;
+  max-width: 240px;
+  accent-color: #007bff;
+  cursor: pointer;
+}
+
+/* ========================================
    MEDIA QUERIES - TABLET (640px+)
    ======================================== */
 

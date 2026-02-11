@@ -13,6 +13,7 @@ export interface ProcessingOptions {
   increaseContrast: boolean;
   removeBackground: boolean;
   paddingEnabled: boolean;
+  contrastThreshold: number;
   inputImageMode: InputImageMode;
   dropShadowEnabled: boolean;
   outputSizeEnabled: boolean;

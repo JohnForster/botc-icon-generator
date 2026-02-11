@@ -526,14 +526,15 @@ export const ensureGrayscale = (imageData: ImageData): ImageData => {
 };
 
 // Increase contrast with dramatic thresholding
-export const increaseContrast = (imageData: ImageData): ImageData => {
+export const increaseContrast = (
+  imageData: ImageData,
+  thresholdPercent: number = 50
+): ImageData => {
   const { width, height, data } = imageData;
   const newImageData = new ImageData(width, height);
   const newData = newImageData.data;
 
-  // Define thresholds (45% and 55% of 255)
-  const lowerThreshold = Math.round(255 * 0.49); // 102
-  const upperThreshold = Math.round(255 * 0.51); // 153
+  const threshold = Math.round((thresholdPercent / 100) * 255);
 
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i];
@@ -550,18 +551,9 @@ export const increaseContrast = (imageData: ImageData): ImageData => {
       continue;
     }
 
-    // Apply dramatic contrast enhancement to each channel
+    // Apply threshold: below → black, at or above → white
     const enhanceValue = (value: number): number => {
-      if (value < lowerThreshold) {
-        // Below minimum% - convert to black
-        return 0;
-      } else if (value > upperThreshold) {
-        // Above maximum% - convert to white
-        return 255;
-      } else {
-        // Middle values - preserve original value
-        return value;
-      }
+      return value < threshold ? 0 : 255;
     };
 
     newData[i] = enhanceValue(r); // R
@@ -903,6 +895,7 @@ export const processImage = async (
   shouldRemoveBackground: boolean = false,
   shouldAddPadding: boolean = false,
   inputImageMode: "black-white" | "greyscale" | "auto" = "auto",
+  contrastThreshold: number = 50,
   shouldApplyDropShadow: boolean = false,
   targetOutputSize: number | null = null
 ): Promise<string> => {
@@ -968,7 +961,7 @@ export const processImage = async (
 
   // Increase contrast if requested (apply after grayscale but before inversion)
   if (shouldEnhanceContrast) {
-    imageData = increaseContrast(imageData);
+    imageData = increaseContrast(imageData, contrastThreshold);
   }
 
   // Invert image if requested (apply before border to invert the content)
