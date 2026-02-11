@@ -459,7 +459,7 @@ export const addContentBorder = (
   if (borderSize <= 0) return imageData;
 
   // Configuration constants
-  const NUM_DIRECTIONS = 16; // Number of shadow directions for smooth border
+  const NUM_DIRECTIONS = 32; // Number of shadow directions for smooth border
 
   const { width, height } = imageData;
 
