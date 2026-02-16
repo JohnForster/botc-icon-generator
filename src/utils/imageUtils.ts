@@ -534,7 +534,12 @@ export const increaseContrast = (
   const newImageData = new ImageData(width, height);
   const newData = newImageData.data;
 
+  const MIDDLE_BAND_PERCENT = 2;
+  const GREY_VALUE = 128;
+  const halfBand = Math.round(((MIDDLE_BAND_PERCENT / 2) / 100) * 255);
   const threshold = Math.round((thresholdPercent / 100) * 255);
+  const lowerThreshold = threshold - halfBand;
+  const upperThreshold = threshold + halfBand;
 
   for (let i = 0; i < data.length; i += 4) {
     const r = data[i];
@@ -551,9 +556,11 @@ export const increaseContrast = (
       continue;
     }
 
-    // Apply threshold: below → black, at or above → white
+    // Apply threshold: below lower → black, above upper → white, middle → grey
     const enhanceValue = (value: number): number => {
-      return value < threshold ? 0 : 255;
+      if (value < lowerThreshold) return 0;
+      if (value >= upperThreshold) return 255;
+      return GREY_VALUE;
     };
 
     newData[i] = enhanceValue(r); // R
