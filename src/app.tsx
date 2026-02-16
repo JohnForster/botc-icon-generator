@@ -9,8 +9,8 @@ import { IconPreview } from "./components/IconPreview";
 
 const DEFAULT_OPTIONS: ProcessingOptions = {
   selectedColor: "red",
-  borderSize: 2,
-  borderEnabled: false,
+  borderSize: 0,
+  borderEnabled: true,
   invertEnabled: false,
   cropEnabled: true,
   horizontalPadding: 0,
@@ -42,6 +42,16 @@ export function App() {
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setPreviewImage(previewUrl);
+
+      // Calculate default border size based on image dimensions
+      const BORDER_SIZE_RATIO = 0.016;
+      const img = new Image();
+      img.onload = () => {
+        const imageSize = Math.max(img.width, img.height);
+        const defaultBorderSize = Math.round(imageSize * BORDER_SIZE_RATIO);
+        setOptions((prev) => ({ ...prev, borderSize: defaultBorderSize }));
+      };
+      img.src = previewUrl;
     } else {
       alert("Invalid image file. Please select a valid image.");
     }
